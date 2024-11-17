@@ -47,12 +47,44 @@ nmap('<leader><cr>h',    ':Lazy help<cr>',    { desc = 'Help'    })
 -- load plugins
 require('lazy').setup({
   spec = {
-    { import = 'plugins.coding' },
-    { import = 'plugins.editor' },
-    { import = 'plugins.lang' },
-    { import = 'plugins.lang-tools' },
-    { import = 'plugins.treesitter' },
+    -- { import = 'plugins.coding' },
+    -- { import = 'plugins.editor' },
+    -- { import = 'plugins.lang' },
+    -- { import = 'plugins.lang.tools' },
+    -- { import = 'plugins.treesitter' },
     { import = 'plugins.ui' },
-    { import = 'plugins.util' },
+    -- { import = 'plugins.util' },
+  },
+  install = {
+    -- install missing plugins on startup. This doesn't increase startup time.
+    missing = true,
+    -- try to load one of these colorschemes when starting an installation during startup
+    colorscheme = { vim.g.colorscheme, 'habamax' },
+  },
+  ui = {
+    -- a number <1 is a percentage., >1 is a fixed size
+    size = { width = 0.8, height = 0.8 },
+    -- The border to use for the UI window. Accepts same border values as |nvim_open_win()|.
+    border = 'rounded',
+    title = ' Lazy ',
+  },
+  checker = {
+    -- automatically check for plugin updates
+    enabled = true,
+    concurrency = 1, ---@type number? set to 1 to check for updates very slowly
+  },
+  performance = {
+    rtp = {
+      disabled_plugins = {
+        'gzip',
+        'matchit',
+        'matchparen',
+        -- "netrwPlugin",
+        'tarPlugin',
+        'tohtml',
+        'tutor',
+        'zipPlugin',
+      },
+    },
   },
 })

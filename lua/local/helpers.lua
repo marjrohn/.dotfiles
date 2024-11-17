@@ -1,21 +1,20 @@
 local M = {}
 
-function M.map(opts_)
-  opts_ = opts_ or {}
-  local has_key_list = false
+function M.map(default_opts)
+  default_opts = default_opts or {}
 
-  if opts_.key_list then
-    if type(opts_.key_list) ~= 'table' then
-      error("'key_list' should be of type table, but got " .. type(opts_.key_list))
-    end
+  local mode = default_opts.mode
+  local key_list = default_opts.key_list
 
-    has_key_list = true
+  default_opts.mode = nil
+  default_opts.key_list = nil
+
+  if key_list and type(key_list) ~= 'table' then
+    error("Invalid 'key_list': Expected a table, got " .. type(key_list))
   end
 
   local _map = function(mode, lhs, rhs, opts)
-    opts = vim.tbl_extend('keep', opts or {}, opts_)
-
-    opts.key_list = nil
+    opts = vim.tbl_extend('keep', opts or {}, default_opts)
 
     if opts.silent == nil then
       opts.silent = true
@@ -27,17 +26,15 @@ function M.map(opts_)
       opts.noremap = true
     end
 
-    vim.keymap.set(mode, lhs, rhs, opts)
-
-    if has_key_list then
-      table.insert(opts_.key_list, lhs)
+    if key_list then
+      opts.mode = mode
+      table.insert(key_list, { lhs, rhs, opts })
+    else
+      vim.keymap.set(mode, lhs, rhs, opts)
     end
   end
 
-  if opts_.mode then
-    local mode = opts_.mode
-    opts_.mode = nil
-
+  if mode then
     return function(lhs, rhs, opts)
       _map(mode, lhs, rhs, opts)
     end

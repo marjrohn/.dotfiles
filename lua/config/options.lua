@@ -7,6 +7,9 @@ local opt = vim.opt
 g.mapleader = ' '
 g.localmapleader = ' '
 
+-- implematation in 'plugins/ui/colorscheme.lua'
+g.colorscheme = 'kanagawa'
+
 -- used by a auto command in 'config.autocmds.lua'
 -- will make 'scrolloff' and 'sidescrolloff' relative
 -- to window current width/height
@@ -90,6 +93,9 @@ opt.number = true
 -- preserve indent structure as much as possible
 opt.preserveindent = true
 
+-- make popup menu transparent
+opt.pumblend = 8
+
 -- make line numbers relative to current line
 opt.relativenumber = true
 
@@ -161,8 +167,8 @@ opt.virtualedit = 'block'
 -- completion mode
 opt.wildmode = { 'longest:full', 'full' }
 
--- make float windows transparents
-opt.winblend = 12
+-- make float windows transparent
+opt.winblend = 8
 
 -- minimum window width
 opt.winminwidth = 8
