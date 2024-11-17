@@ -53,7 +53,7 @@ require('lazy').setup({
     -- { import = 'plugins.lang' },
     -- { import = 'plugins.lang.tools' },
     { import = 'plugins.ui' },
-    -- { import = 'plugins.util' },
+    { import = 'plugins.utils' },
   },
   install = {
     -- install missing plugins on startup. This doesn't increase startup time.
