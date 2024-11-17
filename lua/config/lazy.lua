@@ -48,10 +48,10 @@ nmap('<leader><cr>h',    ':Lazy help<cr>',    { desc = 'Help'    })
 --- load plugins
 require('lazy').setup({
   spec = {
-    -- { import = 'plugins.coding' },
-    { import = 'plugins.editor' },
+    { import = 'plugins.coding' },
+    -- { import = 'plugins.editor' },
     -- { import = 'plugins.lang' },
-    -- { import = 'plugins.lang.tools' },
+    { import = 'plugins.lang.tools' },
     { import = 'plugins.ui' },
     { import = 'plugins.utils' },
   },

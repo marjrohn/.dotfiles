@@ -60,10 +60,10 @@ autocmd('BufReadPost', {
   callback = function(event)
     local exclude = { 'gitcommit' }
     local buf = event.buf
-    if vim.tbl_contains(exclude, vim.bo[buf].filetype) or vim.b[buf].lazyvim_last_loc then
+    if vim.tbl_contains(exclude, vim.bo[buf].filetype) or vim.b[buf].cursor_last_loc then
       return
     end
-    vim.b[buf].lazyvim_last_loc = true
+    vim.b[buf].cursor_last_loc = true
     local mark = vim.api.nvim_buf_get_mark(buf, '"')
     local lcount = vim.api.nvim_buf_line_count(buf)
     if mark[1] > 0 and mark[1] <= lcount then
@@ -151,7 +151,7 @@ autocmd('FileType', {
 })
 
 -- make 'scrolloff' and 'sidescrolloff' relative
-autocmd({ 'WinEnter', 'WinResized' }, {
+autocmd({ 'BufWinEnter', 'WinEnter', 'WinResized' }, {
   group = augroup('win_scrolloff'),
   callback = function()
     local update_scrolloff = function(win)
@@ -166,8 +166,8 @@ autocmd({ 'WinEnter', 'WinResized' }, {
       for _, win in pairs(vim.v.event.windows) do
         update_scrolloff(win)
       end
+    else
+      update_scrolloff(vim.api.nvim_get_current_win())
     end
-
-    update_scrolloff(vim.api.nvim_get_current_win())
   end,
 })

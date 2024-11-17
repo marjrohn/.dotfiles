@@ -46,6 +46,9 @@ kanagawa.opts = {
       DiagnosticVirtualTextInfo = makeDiagnosticColor(theme.diag.info),
       DiagnosticVirtualTextWarn = makeDiagnosticColor(theme.diag.warning),
       DiagnosticVirtualTextError = makeDiagnosticColor(theme.diag.error),
+
+      LspReferenceText = { bg = 'none', underline = true },
+      LspReferenceRead = { bg = 'none', underline = true },
     }
   end,
 }
@@ -57,7 +60,7 @@ kanagawa.opts = {
 if not vim.iter(colorschemes):any(function(name)
   return name == vim.g.colorscheme
 end) then
-  vim.cmd.colorscheme(vim.g.colorscheme)
+  local ok, _ = pcall(vim.cmd.colorscheme, 'vim.g.colorscheme')
 
   if not ok then
     vim.notify(string.format("Invalid colorscheme: '%s'.", vim.g.colorscheme), vim.log.levels.WARN)
