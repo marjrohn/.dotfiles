@@ -33,8 +33,8 @@ nmap('<up>', '<c-y>', { desc = 'Scroll up' })
 nmap('<right>', 'zl', { desc = 'Scroll right' })
 
 -- go to top/bottom of window
-nmap('<s-down>', 'L', { desc = 'Go to top of window' })
-nmap('<s-up>', 'H', { desc = 'Go to bottom of window' })
+nmap('<s-down>', '<c-f>zz', { desc = 'Scroll window down' })
+nmap('<s-up>', '<c-b>zz', { desc = 'Scroll window up' })
 
 -- scroll to far left/right
 nmap('<s-left>', 'zH', { desc = 'Scroll to far left' })

@@ -1,5 +1,4 @@
--- Bootstrap lazy.nvim
-
+--- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -26,8 +25,9 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 
 vim.opt.rtp:prepend(lazypath)
+---
 
--- mappings
+--- keymaps
 local nmap = require('local.helpers').map({ mode = 'n' })
 
 -- stylua: ignore start
@@ -43,15 +43,15 @@ nmap('<leader><cr>p',    ':Lazy profile<cr>', { desc = 'Profile' })
 nmap('<leader><cr>b',    ':Lazy debug<cr>',   { desc = 'Debug'   })
 nmap('<leader><cr>h',    ':Lazy help<cr>',    { desc = 'Help'    })
 -- stylua: ignore end
+---
 
--- load plugins
+--- load plugins
 require('lazy').setup({
   spec = {
     -- { import = 'plugins.coding' },
-    -- { import = 'plugins.editor' },
+    { import = 'plugins.editor' },
     -- { import = 'plugins.lang' },
     -- { import = 'plugins.lang.tools' },
-    -- { import = 'plugins.treesitter' },
     { import = 'plugins.ui' },
     -- { import = 'plugins.util' },
   },
@@ -62,16 +62,14 @@ require('lazy').setup({
     colorscheme = { vim.g.colorscheme, 'habamax' },
   },
   ui = {
-    -- a number <1 is a percentage., >1 is a fixed size
     size = { width = 0.8, height = 0.8 },
-    -- The border to use for the UI window. Accepts same border values as |nvim_open_win()|.
     border = 'rounded',
     title = ' Lazy ',
   },
   checker = {
     -- automatically check for plugin updates
     enabled = true,
-    concurrency = 1, ---@type number? set to 1 to check for updates very slowly
+    concurrency = 1,
   },
   performance = {
     rtp = {
@@ -88,3 +86,4 @@ require('lazy').setup({
     },
   },
 })
+---
