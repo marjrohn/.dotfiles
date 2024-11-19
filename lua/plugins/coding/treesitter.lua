@@ -7,6 +7,7 @@ local spec = { 'nvim-treesitter/nvim-treesitter-textobjects', dependencies = tre
 
 treesitter.opts = {
   sync_install = true,
+  auto_install = true,
   highlight = { enable = true },
   indent = { enable = true },
   ensure_installed = {
