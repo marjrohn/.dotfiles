@@ -1,12 +1,6 @@
 return {
   'stevearc/resession.nvim',
-  opts = {
-    autoload = {
-      enabled = true,
-      interval = 10,
-      notify = false,
-    },
-  },
+  opts = {},
   config = function(_, opts)
     local resession = require('resession')
     local helpers = require('local.helpers')
@@ -17,8 +11,16 @@ return {
 
     resession.setup(opts)
 
+    local function session_load(name, _opts)
+      resession.load(name, _opts)
+
+      vim.iter(require('local.buffer').buf_list()):each(function(buf)
+        require('editorconfig').config(buf)
+      end)
+    end
+
     map('<leader>ss', resession.save)
-    map('<leader>sl', resession.load)
+    map('<leader>sl', session_load)
     map('<leader>sd', resession.delete)
 
     -- automatically save a session named "last" when exiting
@@ -34,12 +36,10 @@ return {
       callback = function()
         -- only load if nvim was started with no args
         if vim.fn.argc(-1) == 0 then
-          local ok, _ = pcall(resession.load, 'last')
+          local ok, _ = pcall(session_load, 'last')
 
           if not ok then
-            vim.notify("Could not load session 'last'", 'warn', {
-              title = 'Resession',
-            })
+            vim.notify("Could not load session 'last'", vim.log.levels.WARN, { title = 'Resession' })
           end
         end
       end,
