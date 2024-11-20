@@ -49,10 +49,10 @@ opt.expandtab = true
 
 -- remove '~' char for empty lines and change fold chars
 opt.fillchars = {
-  foldopen = '',
-  foldclose = '',
+  foldopen = '󰧂',
+  foldclose = '󰘕',
   fold = ' ',
-  foldsep = '│',
+  foldsep = '▎',
   diff = '╱',
   eob = ' ',
 }
