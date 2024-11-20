@@ -106,6 +106,7 @@ vim.opt.sessionoptions = {
   'curdir',
   'folds',
   'globals',
+  'options',
   'skiprtp',
   'resize',
   'tabpages',

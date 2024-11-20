@@ -40,44 +40,33 @@ nmap('<s-up>', '<c-b>zz', { desc = 'Scroll window up' })
 nmap('<s-left>', 'zH', { desc = 'Scroll to far left' })
 nmap('<s-right>', 'zL', { desc = 'Scroll to far right' })
 
--- resize window using
-nmap('<c-up>', '<cmd>resize +2<cr>', { desc = 'Increase Window Height' })
-nmap('<c-down>', '<cmd>resize -2<cr>', { desc = 'Decrease Window Height' })
-nmap('<c-left>', '<cmd>vertical resize -2<cr>', { desc = 'Decrease Window Width' })
-nmap('<c-right>', '<cmd>vertical resize +2<cr>', { desc = 'Increase Window Width' })
+-- resize window
+nmap('<c-left>', '<c-w>>', { desc = 'Decrease Window Width' })
+nmap('<c-down>', '<c-w>-', { desc = 'Decrease Window Height' })
+nmap('<c-up>', '<c-w>+', { desc = 'Increase Window Height' })
+nmap('<c-right>', '<c-w><', { desc = 'Increase Window Width' })
 
 -- move lines
-nmap('<a-j>', '<cmd>m .+1<cr>==', { desc = 'Move Line Down' })
-imap('<a-j>', '<esc><cmd>m .+1<cr>==gi', { desc = 'Move Line Down' })
-xmap('<a-j>', ":m '>+1<cr>gv=gv", { desc = 'Move Line Down' })
-
-nmap('<a-k>', '<cmd>m .-2<cr>==', { desc = 'Move Line Up' })
-imap('<a-k>', '<esc><cmd>m .-2<cr>==gi', { desc = 'Move Line Up' })
-xmap('<a-k>', ":m '<-2<cr>gv=gv", { desc = 'Move Line Down' })
+nmap('<a-j>', "<cmd>execute 'move .+' . v:count1<cr>==", { desc = 'Move line down' })
+nmap('<a-k>', "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==", { desc = 'Move line up' })
+imap('<a-j>', '<esc><cmd>m .+1<cr>==gi', { desc = 'Move line down' })
+imap('<a-k>', '<esc><cmd>m .-2<cr>==gi', { desc = 'Move line up' })
+xmap('<a-j>', ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = 'Move line down' })
+xmap('<a-k>', ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", { desc = 'Move line up' })
 
 -- clear search with <esc>
 map({ 'n', 'i' }, '<esc>', '<cmd>noh<cr><esc>', { desc = 'Escape and Clear Hightlight Search' })
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
-map('n', 'n', "'Nn'[v:searchforward].'zzzv'", { desc = 'Next Search Result', expr = true })
-map('x', 'n', "'Nn'[v:searchforward]", { desc = 'Next Search Result', expr = true })
-map('o', 'n', "'Nn'[v:searchforward]", { desc = 'Next Search Result', expr = true })
-map('n', 'N', "'nN'[v:searchforward].'zzzv'", { desc = 'Prev Search Result', expr = true })
-map('x', 'N', "'nN'[v:searchforward]", { desc = 'Prev Search Result', expr = true })
-map('o', 'N', "'nN'[v:searchforward]", { desc = 'Prev Search Result', expr = true })
+nmap('n', "'Nn'[v:searchforward].'zzzv'", { desc = 'Next Search Result', expr = true })
+nmap('N', "'nN'[v:searchforward].'zzzv'", { desc = 'Prev Search Result', expr = true })
+map({ 'x', 'o' }, 'n', "'Nn'[v:searchforward]", { desc = 'Next Search Result', expr = true })
+map({ 'x', 'o' }, 'N', "'nN'[v:searchforward]", { desc = 'Prev Search Result', expr = true })
 
 -- undo break-points
-imap(',', ',<c-g>u')
-imap('.', '.<c-g>u')
-imap(';', ';<c-g>u')
-imap(':', ':<c-g>u')
-imap('/', '/<c-g>u')
-imap('(', '(<c-g>u')
-imap(')', ')<c-g>u')
-imap('[', '[<c-g>u')
-imap(']', ']<c-g>u')
-imap('{', '{<c-g>u')
-imap('}', '}<c-g>u')
+for _, point in ipairs({ ',', '.', ';', ':', '/', '\\', '(', ')', '[', ']', '{', '}' }) do
+  imap(point, point .. '<c-g>u')
+end
 
 -- file saving
 nmap('<c-s>', '<cmd>w<cr>', { desc = 'Save File' })
@@ -121,7 +110,35 @@ xmap('<leader>P', function()
 end, { desc = 'Paste (System Clipboard)', expr = true })
 ---
 
---- don't yank to register if line is blank
+-- select the latest yanked contents
+nmap('vp', '`[v`]', { desc = 'Select the latest yanked text' })
+
+--- don't yank to register if line(s) is blank
+local function _line_is_blank(pattern)
+  local current_line = vim.fn.line('.')
+  local lines = vim.fn.getline(current_line, current_line + vim.v.count1 - 1)
+
+  return vim.iter(lines):all(function(line)
+    return line:match(pattern) and true or false
+  end)
+end
+
+for _, key in ipairs({ 'yy', 'dd', 'cc' }) do
+  for _, reg in ipairs({ '+', 'others' }) do
+    nmap(reg == '+' and '<leader>' or '' .. key, function()
+      local count = vim.v.count <= 1 and '' or vim.v.count
+      local register = reg == '+' and reg or vim.v.register
+
+      if _line_is_blank(key == 'yy' and '^$' or '^%s*$') then
+        register = '_'
+      end
+
+      vim.cmd('normal! "' .. register .. count .. key)
+    end)
+  end
+end
+
+--[[
 nmap('yy', function()
   if vim.fn.getline('.') ~= '' then
     local count = vim.v.count <= 1 and '' or vim.v.count
@@ -161,9 +178,13 @@ nmap('cc', function()
 
   vim.api.nvim_feedkeys('"' .. reg .. count .. 'cc', 'n', false)
 end, { desc = 'Change Current Line' })
+--]]
 ---
 
--- don't yank when delete with `x`
+-- copy contents of v:register to '+' register
+nmap('yc', "<cmd>silent! call setreg('+', getreg(v:register))<cr>", { desc = 'Copy to system clipboard' })
+
+-- don't yank when delete with `x` or '<del>'
 map({ 'n', 'x' }, 'x', '"_x')
 map({ 'n', 'x' }, 'X', '"_X')
 map({ 'n', 'x' }, '<del>', '"_<del>')
