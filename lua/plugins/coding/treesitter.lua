@@ -3,7 +3,12 @@ local treesitter = {
   build = ':TSUpdate',
   opts_extend = { 'ensure_installed' },
 }
-local spec = { 'nvim-treesitter/nvim-treesitter-textobjects', dependencies = treesitter }
+
+local spec = {
+  { 'nvim-treesitter/nvim-treesitter-textobjects', dependencies = treesitter },
+  { 'windwp/nvim-ts-autotag', config = true },
+  { 'HiPhish/rainbow-delimiters.nvim' },
+}
 
 treesitter.opts = {
   sync_install = true,
