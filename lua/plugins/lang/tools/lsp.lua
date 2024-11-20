@@ -4,7 +4,6 @@ local spec = {
     { 'saghen/blink.cmp' },
     { 'j-hui/fidget.nvim', config = true },
   },
-  opts_extend = { 'servers' },
   opts = {
     servers = {},
   },
@@ -28,8 +27,8 @@ function spec.config(_, opts)
       nmap('<f2>', vim.lsp.buf.rename, { desc = 'Rename' })
       nmap('<leader>lr', vim.lsp.buf.rename, { desc = 'Rename' })
 
-      nmap('<f3>', vim.lsp.buf.format, { desc = 'Format' })
-      nmap('<leader>lf', vim.lsp.buf.format, { desc = 'Format' })
+      map({ 'n', 'x' }, '<f3>', vim.lsp.buf.format, { desc = 'Format' })
+      map({ 'n', 'x' }, '<leader>lf', vim.lsp.buf.format, { desc = 'Format' })
 
       map({ 'n', 'x' }, 'gra', vim.lsp.buf.code_action, { desc = 'Code Action' })
       map({ 'n', 'x' }, '<f4>', vim.lsp.buf.code_action, { desc = 'Code Action' })
