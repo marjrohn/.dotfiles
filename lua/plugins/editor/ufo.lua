@@ -85,7 +85,7 @@ function spec.config(_, opts)
   nmap('zM', ufo.closeAllFolds, { desc = 'Close All Folds' })
   nmap('zr', ufo.openFoldsExceptKinds, { desc = 'Fold Less' })
   nmap('zm', ufo.closeFoldsWith, { desc = 'Fold more' })
-  nmap('zp', ufo.peekFoldedLinesUnderCursor, { desc = 'Peak Fold'})
+  nmap('zp', ufo.peekFoldedLinesUnderCursor, { desc = 'Peak Fold' })
 end
 
 return spec
