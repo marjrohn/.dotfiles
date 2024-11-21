@@ -4,13 +4,13 @@ function spec.config(_, opts)
   local builtin = require('statuscol.builtin')
   local ffi = require('statuscol.ffidef')
 
-  local hl_range = 16
+  local hl_range = 24
   local color1 = vim.api.nvim_get_hl(0, { name = 'CursorLineNr' }).fg
   local color2 = vim.api.nvim_get_hl(0, { name = 'LineNr' }).fg
 
   for i = 1, hl_range do
     vim.api.nvim_set_hl(0, 'RelLineNr' .. i, {
-      fg = require('local.theme').mix_colors(color1, color2, i / (hl_range + 1)),
+      fg = require('local.theme').mix_colors(color1, color2, math.sqrt(i / (hl_range + 1))),
     })
   end
 

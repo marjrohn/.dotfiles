@@ -40,7 +40,7 @@ end
 function M.mix_colors(hex1, hex2, alpha)
   local new_color = {}
 
-  alpha = math.max(math.min(alpha, 1), 0)
+  alpha = math.min(math.max(alpha, 0), 1)
   local rgb1 = M.hex_to_rgb(hex1)
   local rgb2 = M.hex_to_rgb(hex2)
 
@@ -49,6 +49,42 @@ function M.mix_colors(hex1, hex2, alpha)
   end)
 
   return M.rgb_to_hex(new_color)
+end
+
+function M.gen_lualine_theme(colorscheme)
+  colorscheme = colorscheme or vim.g.colorscheme
+
+  local ok, _theme = pcall(require, 'lualine.themes.' .. colorscheme)
+
+  if not ok then
+    return 'auto'
+  end
+
+  local modes = {}
+  local fg_base = _theme.normal.a.fg
+  local fg_text = _theme.normal.b.fg
+  local fg_muted = _theme.inactive.b.fg
+
+  for _, mode in ipairs({ 'normal', 'insert', 'visual', 'replace', 'command', 'inactive' }) do
+    modes[mode] = _theme[mode].a.bg
+  end
+
+  local theme = {}
+
+  for mode, color in pairs(modes) do
+    local is_inactive = (mode == 'inactive')
+    local fg_a = is_inactive and fg_muted or fg_base
+    local fg_b = is_inactive and fg_muted or fg_text
+    local gui = (not is_inactive) and 'bold'
+
+    theme[mode] = {
+      a = { bg = color, fg = fg_a, gui = gui },
+      b = { bg = 'none', fg = fg_b },
+      c = { bg = 'none', fg = color, gui = gui },
+    }
+  end
+
+  return theme
 end
 
 return M
