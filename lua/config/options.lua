@@ -7,8 +7,10 @@ local opt = vim.opt
 g.mapleader = ' '
 g.localmapleader = ' '
 
--- implematation in 'plugins/ui/colorscheme.lua'
 g.colorscheme = 'kanagawa'
+-- this will load the variant 'dragon'
+-- of the kanagawa colorscheme
+-- g.colorscheme = { 'kanagawa', 'dragon' }
 
 -- used by a auto command in 'config.autocmds.lua'
 -- will make 'scrolloff' and 'sidescrolloff' relative
@@ -49,8 +51,8 @@ opt.expandtab = true
 
 -- remove '~' char for empty lines and change fold chars
 opt.fillchars = {
-  foldopen = '󰧂',
-  foldclose = '󰘕',
+  foldopen = '󰞘',
+  foldclose = '󰞓',
   fold = ' ',
   foldsep = '▎',
   diff = '╱',
@@ -104,6 +106,7 @@ vim.opt.sessionoptions = {
   'blank',
   'buffers',
   'curdir',
+  'folds',
   'globals',
   'skiprtp',
   'resize',

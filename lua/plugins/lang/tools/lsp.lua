@@ -107,6 +107,11 @@ function spec.config(_, opts)
   })
 
   for server, config in pairs(opts.servers) do
+    config.capabilities = vim.tbl_extend('force', config.capabilities or {}, {
+      textDocument = {
+        foldingRange = { dynamicRegistration = false, lineFoldingOnly = true },
+      },
+    })
     config.capabilities = require('blink.cmp').get_lsp_capabilities(config.capabilities)
 
     require('lspconfig')[server].setup(config)

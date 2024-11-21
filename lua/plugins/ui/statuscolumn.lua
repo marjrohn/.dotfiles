@@ -1,4 +1,9 @@
-local spec = { 'luukvbaal/statuscol.nvim', opts = {} }
+local spec = {
+  'luukvbaal/statuscol.nvim',
+  opts = {},
+}
+
+spec.opts.ft_ignore = { 'help', 'lazy', 'TelescopePrompt', 'undotree' }
 
 function spec.config(_, opts)
   local builtin = require('statuscol.builtin')
@@ -108,7 +113,6 @@ function spec.config(_, opts)
     sign = {
       namespace = { 'diagnostic/signs' },
       colwidth = 1,
-      maxwidth = 2,
       wrap = true,
       foldclosed = true,
     },
@@ -117,10 +121,11 @@ function spec.config(_, opts)
 
   table.insert(opts.segments, {
     text = {
+      ' ',
       function(args)
         local hl
         local foldinfo = ffi.C.fold_info(args.wp, args.lnum)
-        local symbol = args.fold.sep
+        local symbol = args.fold.sep or ''
 
         local foldclosed = foldinfo.lines > 0
 
