@@ -106,7 +106,6 @@ vim.opt.sessionoptions = {
   'blank',
   'buffers',
   'curdir',
-  'folds',
   'globals',
   'skiprtp',
   'resize',

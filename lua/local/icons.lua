@@ -6,6 +6,7 @@ local M = {
 M.clock = ''
 M.directory = ''
 M.dots = ''
+M.close = ''
 
 M.git = {
   logo = '',
@@ -28,6 +29,12 @@ M.diagnostics = {
   warn = '',
   info = '',
   hint = '',
+}
+
+M.tab = {
+  head = ' 󰓩 ',
+  active = '',
+  inactive = '',
 }
 
 return M

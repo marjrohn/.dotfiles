@@ -53,7 +53,14 @@ function spec.config(_, opts)
       -- word under your cursor when your cursor rests there for a little while.
       local client = vim.lsp.get_client_by_id(event.data.client_id)
 
-      if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+      if not client then
+        return
+      end
+
+      -- set cwd for current tab
+      vim.cmd.tcd(client.root_dir)
+
+      if client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
         local highlight_augroup = augroup('lsp_highlight', true)
 
         autocmd({ 'CursorHold', 'CursorHoldI' }, {
@@ -79,7 +86,7 @@ function spec.config(_, opts)
 
       -- The following code creates a keymap to toggle inlay hints in your
       -- code, if the language server upports them
-      if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+      if client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
         nmap('<leader>lH', function()
           vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
         end, { desc = 'Toggle Inlay Hints' })
@@ -91,7 +98,7 @@ function spec.config(_, opts)
   local signs = require('local.icons').diagnostics
 
   for type, icon in pairs(signs) do
-    local hl = 'DiagnosticSign' .. type:lower():gsub('^%l', string.upper)
+    local hl = 'DiagnosticSign' .. type:gsub('^%l', string.upper)
     vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
   end
   ---

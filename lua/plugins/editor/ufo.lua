@@ -77,15 +77,58 @@ end
 
 function spec.config(_, opts)
   local ufo = require('ufo')
-  local nmap = require('local.helpers').map({ mode = 'n' })
-
   ufo.setup(opts)
 
-  nmap('zR', ufo.openAllFolds, { desc = 'Open All Folds' })
-  nmap('zM', ufo.closeAllFolds, { desc = 'Close All Folds' })
-  nmap('zr', ufo.openFoldsExceptKinds, { desc = 'Fold Less' })
-  nmap('zm', ufo.closeFoldsWith, { desc = 'Fold more' })
-  nmap('zp', ufo.peekFoldedLinesUnderCursor, { desc = 'Peak Fold' })
+  local function get_highest_level()
+    local buf = vim.api.nvim_get_current_buf()
+    local folds = require('ufo.fold').get(buf).foldRanges
+
+    local levels = vim.iter(folds):map(function(fold)
+      return vim.fn.foldlevel(fold.endLine)
+    end)
+
+    local max_level = levels:fold(0, function(max, level)
+      return math.max(max, level)
+    end)
+
+    return max_level
+  end
+
+  local function add_to_fold_level(value)
+    local highest_level = get_highest_level()
+    local level = vim.b.fold_level or highest_level
+
+    vim.b.fold_level = math.min(math.max(level + value, 0), highest_level)
+  end
+
+  local function open_all_folds()
+    vim.b.fold_level = get_highest_level()
+    ufo.openAllFolds()
+  end
+
+  local function close_all_folds()
+    vim.b.fold_level = 0
+    ufo.closeAllFolds()
+  end
+
+  local function fold_less()
+    add_to_fold_level(vim.v.count1)
+    ufo.closeFoldsWith(vim.b.fold_level)
+  end
+
+  local function fold_more()
+    add_to_fold_level(-vim.v.count1)
+    ufo.closeFoldsWith(vim.b.fold_level)
+  end
+
+  local nmap = require('local.helpers').map({ mode = 'n' })
+  -- stylua: ignore start
+  nmap('zR', open_all_folds,  { desc = 'Open All Folds' })
+  nmap('zM', close_all_folds, { desc = 'Close All Folds' })
+  nmap('zr', fold_less,       { desc = 'Fold Less' })
+  nmap('zm', fold_more,       { desc = 'Fold more' })
+  -- stylua: ignore end
+  nmap('zp', ufo.peekFoldedLinesUnderCursor, { desc = 'Peak Fold Under Cursor' })
 end
 
 return spec

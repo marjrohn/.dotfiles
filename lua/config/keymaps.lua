@@ -125,7 +125,7 @@ end
 
 for _, key in ipairs({ 'yy', 'dd', 'cc' }) do
   for _, reg in ipairs({ '+', 'others' }) do
-    nmap(reg == '+' and '<leader>' or '' .. key, function()
+    nmap((reg == '+' and '<leader>' or '') .. key, function()
       local count = vim.v.count <= 1 and '' or vim.v.count
       local register = reg == '+' and reg or vim.v.register
 
@@ -133,7 +133,7 @@ for _, key in ipairs({ 'yy', 'dd', 'cc' }) do
         register = '_'
       end
 
-      vim.cmd('normal! "' .. register .. count .. key)
+      vim.api.nvim_feedkeys('"' .. register .. count .. key, 'n', false)
     end)
   end
 end
@@ -283,4 +283,16 @@ for i = 1, 9 do
   nmap('<leader><tab>' .. i, '<cmd>silent! tabnext ' .. i .. '<cr>', { desc = 'Go to Tab ' .. i })
   nmap('<a-' .. i .. '>', '<cmd>silent! tabnext ' .. i .. '<cr>', { desc = 'Go to Tab ' .. i })
 end
+
+nmap('<leader><tab>t', function()
+  if vim.o.tabline == 1 then
+    if vim.fn.tabpagenr('$') > 1 then
+      vim.opt.showtabline = 0
+    else
+      vim.opt.showtabline = 2
+    end
+  else
+    vim.opt.showtabline = 2 * ((vim.o.showtabline / 2 + 1) % 2) -- cycle between 0 and 2
+  end
+end, { desc = 'Toggle Tab Line' })
 ---

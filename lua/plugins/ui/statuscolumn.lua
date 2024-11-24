@@ -23,8 +23,8 @@ function spec.config(_, opts)
 
   vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
     group = vim.api.nvim_create_augroup('Statuscol Fold', { clear = false }),
-    callback = function(ev)
-      if vim.tbl_contains(opts.ft_ignore or {}, vim.bo[ev.buf].filetype) then
+    callback = function(event)
+      if vim.tbl_contains(opts.ft_ignore or {}, vim.bo[event.buf].filetype) then
         return
       end
 
@@ -40,17 +40,44 @@ function spec.config(_, opts)
         cursor_fold.start = -1
         cursor_fold.end_ = -1
       elseif line < cursor_fold.start or line > cursor_fold.end_ or foldlevel ~= cursor_fold.level then
-        cursor_fold.level = foldlevel
+        local ufo_available, fold_ = pcall(require, 'ufo.fold')
 
-        local foldstart = vim.fn.foldclosed(line)
-        if foldstart ~= -1 then
-          cursor_fold.start = foldstart
-          cursor_fold.end_ = vim.fn.foldclosedend(line)
-        else
-          vim.cmd('silent! ' .. line .. 'foldclose')
-          cursor_fold.start = vim.fn.foldclosed(line)
-          cursor_fold.end_ = vim.fn.foldclosedend(line)
-          vim.cmd('silent! ' .. line .. 'foldopen')
+        if ufo_available then
+          fold_ = fold_.get(event.buf)
+          local folds = vim.iter(fold_ and fold_.foldRanges or {}):map(function(fold)
+            return { start = fold.startLine + 1, end_ = fold.endLine + 1 }
+          end)
+
+          folds = folds:filter(function(fold)
+            return fold.start <= line and line <= fold.end_
+          end)
+
+          cursor_fold = folds:fold(nil, function(cur_fold, fold)
+            cur_fold = cur_fold or fold
+            cur_fold.level = foldlevel
+
+            if fold.end_ - fold.start < cur_fold.end_ - cur_fold.start then
+              cur_fold.start = fold.start
+              cur_fold.end_ = fold.end_
+            end
+
+            return cur_fold
+          end)
+        end
+
+        if not cursor_fold then
+          cursor_fold = {}
+          local foldstart = vim.fn.foldclosed(line)
+
+          if foldstart ~= -1 then
+            cursor_fold.start = foldstart
+            cursor_fold.end_ = vim.fn.foldclosedend(line)
+          else
+            vim.cmd('silent! ' .. line .. 'foldclose')
+            cursor_fold.start = vim.fn.foldclosed(line)
+            cursor_fold.end_ = vim.fn.foldclosedend(line)
+            vim.cmd('silent! ' .. line .. 'foldopen')
+          end
         end
       end
     end,
@@ -136,7 +163,7 @@ function spec.config(_, opts)
         end
 
         if foldclosed or (args.lnum >= cursor_fold.start and args.lnum <= cursor_fold.end_) then
-          hl = '%#ErrorMsg#'
+          hl = '%#Normal#'
         else
           hl = get_hl(args)
         end
