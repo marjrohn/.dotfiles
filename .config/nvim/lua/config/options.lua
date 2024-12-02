@@ -8,9 +8,6 @@ g.mapleader = ' '
 g.localmapleader = ' '
 
 g.colorscheme = 'kanagawa'
--- this will load the variant 'dragon'
--- of the kanagawa colorscheme
--- g.colorscheme = { 'kanagawa', 'dragon' }
 
 -- used by a auto command in 'config.autocmds.lua'
 -- will make 'scrolloff' and 'sidescrolloff' relative
@@ -107,6 +104,7 @@ vim.opt.sessionoptions = {
   'buffers',
   'curdir',
   'globals',
+  'localoptions',
   'skiprtp',
   'resize',
   'tabpages',

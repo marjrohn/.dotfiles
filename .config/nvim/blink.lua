@@ -1,7 +1,7 @@
 return {
   'saghen/blink.cmp',
   dependencies = 'rafamadriz/friendly-snippets',
-  build = 'cargo build --release',
+  build = 'cargo +nightly build --release',
   opts = {
     nerd_font_variant = 'mono',
     highlight = { use_nvim_cmp_as_default = true },

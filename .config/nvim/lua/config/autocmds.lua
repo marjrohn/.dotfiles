@@ -5,7 +5,7 @@ local autocmd = require('local.helpers').autocmd
 
 if vim.env.TERM == 'xterm-kitty' then
   local kitty_cmd = 'kitty'
-  if vim.env.CONTAINER_ID ~= nil then
+  if vim.env.CONTAINER_ID and vim.fn.executable('kitty') == 0 then
     kitty_cmd = 'distrobox-host-exec ' .. kitty_cmd
   end
 

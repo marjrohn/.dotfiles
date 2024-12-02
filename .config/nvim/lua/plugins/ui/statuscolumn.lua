@@ -9,13 +9,13 @@ function spec.config(_, opts)
   local builtin = require('statuscol.builtin')
   local ffi = require('statuscol.ffidef')
 
-  local hl_range = 24
+  local hl_range = 16
   local color1 = vim.api.nvim_get_hl(0, { name = 'CursorLineNr' }).fg
   local color2 = vim.api.nvim_get_hl(0, { name = 'LineNr' }).fg
 
   for i = 1, hl_range do
     vim.api.nvim_set_hl(0, 'RelLineNr' .. i, {
-      fg = require('local.theme').mix_colors(color1, color2, math.sqrt(i / (hl_range + 1))),
+      fg = require('local.theme').mix_colors(color1, color2, math.pow(i / (hl_range + 1), 0.20)),
     })
   end
 
@@ -113,6 +113,7 @@ function spec.config(_, opts)
     text = {
       function(args, segment)
         local buf = vim.api.nvim_win_get_buf(args.win)
+        local hl
         if
           vim.iter(vim.fn.sign_getplaced(buf, { group = '*', lnum = args.lnum })[1].signs):any(function(sign)
             local ns_id = vim.api.nvim_get_namespaces()[sign.group]
@@ -126,10 +127,26 @@ function spec.config(_, opts)
             return extmark[3].number_hl_group and true or false
           end)
         then
-          return builtin.lnumfunc(args, segment)
+          hl = ''
+        else
+          hl = get_hl(args)
         end
 
-        return '%*' .. get_hl(args) .. builtin.lnumfunc(args, segment) .. '%*'
+        if args.sclnu and segment.sign and segment.sign.wins[args.win].signs[args.lnum] then
+          return "%="..builtin.signfunc(args, segment)
+        end
+        if not args.rnu and not args.nu then return "" end
+        if args.virtnum ~= 0 then return "%=" end
+
+        local lnum = args.rnu and (args.relnum > 0 and args.relnum
+        or (args.nu and args.lnum or 0)) or args.lnum
+
+        local _lnum = string.format('%' .. vim.o.numberwidth .. 'd', lnum)
+        if args.relnum == 0 and args.rnu then
+          return hl .. _lnum.. "%="
+        else
+          return hl .. "%=" .. _lnum
+        end
       end,
       ' ',
     },

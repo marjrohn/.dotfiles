@@ -57,13 +57,13 @@ function M.gen_lualine_theme(colorscheme)
   local ok, _theme = pcall(require, 'lualine.themes.' .. colorscheme)
 
   if not ok then
-    return 'auto'
+    _theme = require('lualine.themes.auto')
   end
 
   local modes = {}
   local fg_base = _theme.normal.a.fg
   local fg_text = _theme.normal.b.fg
-  local fg_muted = _theme.inactive.b.fg
+  local fg_muted = _theme.inactive.a.fg
 
   for _, mode in ipairs({ 'normal', 'insert', 'visual', 'replace', 'command', 'inactive' }) do
     modes[mode] = _theme[mode].a.bg
