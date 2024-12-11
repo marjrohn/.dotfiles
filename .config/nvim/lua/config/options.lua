@@ -8,6 +8,9 @@ g.mapleader = ' '
 g.localmapleader = ' '
 
 g.colorscheme = 'kanagawa'
+-- this will load the variant 'dragon'
+-- of the kanagawa colorscheme
+-- g.colorscheme = { 'kanagawa', 'dragon' }
 
 -- used by a auto command in 'config.autocmds.lua'
 -- will make 'scrolloff' and 'sidescrolloff' relative
@@ -88,12 +91,13 @@ opt.mouse = 'a'
 
 -- show line numbers
 opt.number = true
+opt.numberwidth = 3
 
 -- preserve indent structure as much as possible
 opt.preserveindent = true
 
 -- make popup menu transparent
-opt.pumblend = 8
+opt.pumblend = 12
 
 -- make line numbers relative to current line
 opt.relativenumber = true
@@ -103,6 +107,7 @@ vim.opt.sessionoptions = {
   'blank',
   'buffers',
   'curdir',
+  'folds',
   'globals',
   'localoptions',
   'skiprtp',
@@ -164,9 +169,6 @@ opt.virtualedit = 'block'
 
 -- completion mode
 opt.wildmode = { 'longest:full', 'full' }
-
--- make float windows transparent
-opt.winblend = 8
 
 -- minimum window width
 opt.winminwidth = 8

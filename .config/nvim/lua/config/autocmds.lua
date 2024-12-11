@@ -158,6 +158,9 @@ autocmd({ 'BufWinEnter', 'WinEnter', 'WinResized' }, {
       local w = vim.api.nvim_win_get_width(win)
       local h = vim.api.nvim_win_get_height(win)
 
+      vim.g.scrolloff = math.min(math.max(vim.g.scrolloff or 0, 0), 0.5)
+      vim.g.sidescrolloff = math.min(math.max(vim.g.sidescrolloff or 0, 0), 0.5)
+
       vim.wo[win].sidescrolloff = math.floor(vim.g.sidescrolloff * w + 0.5)
       vim.wo[win].scrolloff = math.floor(vim.g.scrolloff * h + 0.5)
     end

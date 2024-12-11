@@ -27,18 +27,18 @@ nmap('<c-k>', '<c-w>k', { desc = 'Go to Upper Window', remap = true })
 nmap('<c-l>', '<c-w>l', { desc = 'Go to Right Window', remap = true })
 
 -- scroll window
-nmap('<left>', 'zh', { desc = 'Scroll left' })
-nmap('<down>', '<c-e>', { desc = 'Scroll down' })
-nmap('<up>', '<c-y>', { desc = 'Scroll up' })
-nmap('<right>', 'zl', { desc = 'Scroll right' })
+map({ 'n', 'x' }, '<left>', 'zh', { desc = 'Scroll left' })
+map({ 'n', 'x' }, '<down>', '<c-e>', { desc = 'Scroll down' })
+map({ 'n', 'x' }, '<up>', '<c-y>', { desc = 'Scroll up' })
+map({ 'n', 'x' }, '<right>', 'zl', { desc = 'Scroll right' })
 
 -- go to top/bottom of window
-nmap('<s-down>', '<c-f>zz', { desc = 'Scroll window down' })
-nmap('<s-up>', '<c-b>zz', { desc = 'Scroll window up' })
+map({ 'n', 'x' }, '<s-down>', '<c-f>zz', { desc = 'Scroll window down' })
+map({ 'n', 'x' }, '<s-up>', '<c-b>zz', { desc = 'Scroll window up' })
 
 -- scroll to far left/right
-nmap('<s-left>', 'zH', { desc = 'Scroll to far left' })
-nmap('<s-right>', 'zL', { desc = 'Scroll to far right' })
+map({ 'n', 'x' }, '<s-left>', 'zH', { desc = 'Scroll to far left' })
+map({ 'n', 'x' }, '<s-right>', 'zL', { desc = 'Scroll to far right' })
 
 -- resize window
 nmap('<c-left>', '<c-w>>', { desc = 'Decrease Window Width' })
@@ -138,49 +138,6 @@ for _, key in ipairs({ 'yy', 'dd', 'cc' }) do
   end
 end
 
---[[
-nmap('yy', function()
-  if vim.fn.getline('.') ~= '' then
-    local count = vim.v.count <= 1 and '' or vim.v.count
-    local reg = vim.v.register
-
-    vim.api.nvim_feedkeys('"' .. reg .. count .. 'yy', 'n', false)
-  end
-end, { desc = 'Yank Current Line' })
-
-nmap('<leader>yy', function()
-  if vim.fn.getline('.') ~= '' then
-    local count = vim.v.count <= 1 and '' or vim.v.count
-    local reg = '+'
-
-    vim.api.nvim_feedkeys('"' .. reg .. count .. 'yy', 'n', false)
-  end
-end, { desc = 'Yank Current Line (System Clipboard)' })
-
-nmap('dd', function()
-  local count = vim.v.count <= 1 and '' or vim.v.count
-  local reg = vim.v.register
-
-  if vim.fn.getline('.'):match('^%s*$') then
-    reg = '_'
-  end
-
-  vim.api.nvim_feedkeys('"' .. reg .. count .. 'dd', 'n', false)
-end, { desc = 'Delete Current Line' })
-
-nmap('cc', function()
-  local count = vim.v.count <= 1 and '' or vim.v.count
-  local reg = vim.v.register
-
-  if vim.fn.getline('.'):match('^%s*$') then
-    reg = '_'
-  end
-
-  vim.api.nvim_feedkeys('"' .. reg .. count .. 'cc', 'n', false)
-end, { desc = 'Change Current Line' })
---]]
----
-
 -- copy contents of v:register to '+' register
 nmap('yc', "<cmd>silent! call setreg('+', getreg(v:register))<cr>", { desc = 'Copy to system clipboard' })
 
@@ -249,7 +206,7 @@ nmap(']b', '<cmd>bnext<cr>', { desc = 'Next Buffer' })
 nmap('<leader>bn', '<cmd>enew<cr>', { desc = 'New Buffer' })
 nmap('<leader>bb', '<cmd>edit #<cr>', { desc = 'Switch to Other Buffer' })
 nmap('<leader>bD', '<cmd>:bdelete<cr>', { desc = 'Delete Buffer and Window' })
--- nmap('<leader>bd', require('utils').buf_remove, { desc = 'Delete Buffer' })
+nmap('<leader>bd', require('local.buffer').buf_remove, { desc = 'Delete Buffer' })
 ---
 
 -- windows

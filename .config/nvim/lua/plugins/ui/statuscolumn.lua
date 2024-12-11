@@ -9,15 +9,33 @@ function spec.config(_, opts)
   local builtin = require('statuscol.builtin')
   local ffi = require('statuscol.ffidef')
 
-  local hl_range = 16
-  local color1 = vim.api.nvim_get_hl(0, { name = 'CursorLineNr' }).fg
-  local color2 = vim.api.nvim_get_hl(0, { name = 'LineNr' }).fg
+  local hl_range
 
-  for i = 1, hl_range do
-    vim.api.nvim_set_hl(0, 'RelLineNr' .. i, {
-      fg = require('local.theme').mix_colors(color1, color2, math.pow(i / (hl_range + 1), 0.20)),
-    })
+  local function gen_relline_hls()
+    local v = 1 - vim.g.scrolloff
+    hl_range = math.ceil(vim.api.nvim_win_get_height(0) * v)
+
+    local color1 = vim.api.nvim_get_hl(0, { name = 'CursorLineNr' }).fg
+    local color2 = vim.api.nvim_get_hl(0, { name = 'LineNr' }).fg
+
+    for i = 1, hl_range do
+      local alpha = math.sqrt(i / (hl_range + 1))
+
+      vim.api.nvim_set_hl(0, 'RelLineNr' .. i, {
+        fg = require('local.theme').mix_colors(color1, color2, alpha),
+      })
+    end
   end
+
+  gen_relline_hls()
+
+  local autocmd = require('local.helpers').autocmd
+  local augroup = require('local.helpers').augroup
+
+  autocmd({ 'WinEnter', 'WinResized' }, {
+    group = augroup('statuscolumn_relline_hl'),
+    callback = gen_relline_hls,
+  })
 
   local cursor_fold = { level = 0, start = -1, end_ = -1 }
 
@@ -90,9 +108,9 @@ function spec.config(_, opts)
       name = { '*' },
       -- take anything except diagnostics, since will be added after numbers
       namespace = { '^(?!.*diagnostic).*$' },
-      colwidth = 1,
       wrap = true,
       foldclosed = true,
+      auto = true,
     },
     click = 'v:lua.ScSa',
   })
@@ -133,20 +151,23 @@ function spec.config(_, opts)
         end
 
         if args.sclnu and segment.sign and segment.sign.wins[args.win].signs[args.lnum] then
-          return "%="..builtin.signfunc(args, segment)
+          return '%=' .. builtin.signfunc(args, segment)
         end
-        if not args.rnu and not args.nu then return "" end
-        if args.virtnum ~= 0 then return "%=" end
 
-        local lnum = args.rnu and (args.relnum > 0 and args.relnum
-        or (args.nu and args.lnum or 0)) or args.lnum
+        if not args.rnu and not args.nu then
+          return ''
+        end
+        if args.virtnum ~= 0 then
+          return '%='
+        end
 
-        local _lnum = string.format('%' .. vim.o.numberwidth .. 'd', lnum)
+        local lnum = args.rnu and (args.relnum > 0 and args.relnum or (args.nu and args.lnum or 0)) or args.lnum
+
         if args.relnum == 0 and args.rnu then
-          return hl .. _lnum.. "%="
-        else
-          return hl .. "%=" .. _lnum
+          return hl .. lnum .. '%='
         end
+
+        return hl .. '%=' .. string.format('%' .. vim.o.numberwidth .. 'd', lnum)
       end,
       ' ',
     },

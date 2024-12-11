@@ -37,26 +37,32 @@ run sudo "apk update && apk upgrade"
 run sudo "apk add \
     stow make gcc rustup musl musl-dev openssl-dev openssl-libs-static \
     python3 python3-dev py3-virtualenv py3-wheel py3-pip pipx \
-    neovim neovim-doc lua5.1 luarocks5.1 lua-language-server \
     git lazygit zsh zoxide fzf bat eza fd ripgrep \
-    yazi 7zip jq poppler imagemagick wl-clipboard"
-
-run "git clone https://github.com/marjrohn/.dotfiles.git $CONTAINER_HOME/.dotfiles"
-run "cd $CONTAINER_HOME/.dotfiles && stow ."
+    neovim lua5.1 luarocks5.1 lua-language-server \
+    yazi 7zip jq poppler imagemagick wl-clipboard \
+    kitty kitty-kitten mesa-egl"
 
 run "chsh -s /bin/zsh"
+
 run "mkdir -p $CONTAINER_HOME/.local/bin $CONTAINER_HOME/.local/share"
 run "ln -s /usr/bin/luarocks-5.1 $CONTAINER_HOME/.local/bin/luarocks"
 run "ln -s $HOME/.local/share/fonts $CONTAINER_HOME/.local/share/fonts"
 
-run "rustup-init -y"
-run "$CONTAINER_HOME/.cargo/bin/rustup toolchain install nightly"
-run "$CONTAINER_HOME/.cargo/bin/cargo install cargo-update tree-sitter-cli stylua selene"
+run "git clone https://github.com/marjrohn/.dotfiles.git $CONTAINER_HOME/.dotfiles"
+run "cd $CONTAINER_HOME/.dotfiles && stow ."
 
-run "nvim --headless \"+Lazy! Sync\" +qa"
+run "rustup-init -y"
+
+run "export PATH=$PATH:$CONTAINER_HOME/.cargo/bin && \
+	rustup toolchain install nightly && \
+	cargo install cargo-update tree-sitter-cli stylua selene"
+
+run "distrobox-export --app kitty"
+
+distrobox stop --yes $CONTAINER_NAME
 ```
 
-To update everything you can run the following commands inside the container
+To update everything you can run the following commands inside the container.
 
 ```bash
 sudo apk update && sudo apk upgrade
