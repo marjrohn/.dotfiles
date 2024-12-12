@@ -5,7 +5,10 @@ local spec = {
   opts = {},
 }
 
+spec.opts.blend = { factor = 0.1 }
+
 spec.opts.options = {
+  show_source = true,
   multilines = true,
   multiple_diag_under_cursor = true,
   show_all_diags_on_cursorline = true,

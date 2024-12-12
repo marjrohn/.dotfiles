@@ -9,14 +9,15 @@ local lazydev = {
   { 'Bilal2453/luvit-meta', lazy = true },
 }
 
-local lsp = {
-  'neovim/nvim-lspconfig',
-  opts = { servers = {} },
-}
+local treesitter = { 'nvim-treesitter/nvim-treesitter', opts = {} }
+local lsp = { 'neovim/nvim-lspconfig', opts = { servers = {} } }
+local cmp = { 'saghen/blink.cmp', opts = {} }
+local null_ls = { 'nvimtools/none-ls.nvim' }
 
-local cmp = {
-  'saghen/blink.cmp',
-  opts = {},
+treesitter.opts.ensure_installed = {
+  'lua',
+  'luap',
+  'luadoc',
 }
 
 lsp.opts.servers.lua_ls = {
@@ -27,9 +28,17 @@ lsp.opts.servers.lua_ls = {
 }
 
 cmp.opts.sources = {
-  -- add lazydev to completion providers
   default = { 'lazydev' },
   providers = { lazydev = { name = 'LazyDev', module = 'lazydev.integrations.blink' } },
 }
 
-return vim.list_extend(lazydev, { lsp, cmp })
+function null_ls.opts(_, opts)
+  opts.sources = opts.sources or {}
+
+  vim.list_extend(opts.sources, {
+    require('null-ls').builtins.formatting.stylua,
+    require('null-ls').builtins.diagnostics.selene,
+  })
+end
+
+return vim.list_extend(lazydev, { treesitter, lsp, cmp, null_ls })
