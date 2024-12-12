@@ -11,10 +11,4 @@ spec.opts.options = {
   show_all_diags_on_cursorline = true,
 }
 
-function spec.config(_, opts)
-  require('tiny-inline-diagnostic').setup(opts)
-
-  vim.diagnostic.config({ virtual_text = false })
-end
-
 return spec

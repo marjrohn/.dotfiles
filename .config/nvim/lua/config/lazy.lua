@@ -50,7 +50,7 @@ require('lazy').setup({
   spec = {
     { import = 'plugins.coding' },
     { import = 'plugins.editor' },
-    -- { import = 'plugins.lang' },
+    { import = 'plugins.lang' },
     { import = 'plugins.lang.tools' },
     { import = 'plugins.ui' },
     { import = 'plugins.utils' },

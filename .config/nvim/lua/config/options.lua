@@ -3,16 +3,32 @@
 local g = vim.g
 local opt = vim.opt
 
+vim.diagnostic.config({
+  virtual_text = false,
+  severity_sort = true,
+  -- stylua: ignore
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = require('local.icons').diagnostics.error,
+      [vim.diagnostic.severity.WARN]  = require('local.icons').diagnostics.warn,
+      [vim.diagnostic.severity.INFO]  = require('local.icons').diagnostics.info,
+      [vim.diagnostic.severity.HINT]  = require('local.icons').diagnostics.hint,
+    },
+    numhl = {
+      [vim.diagnostic.severity.ERROR] = 'DiagnosticError',
+      [vim.diagnostic.severity.WARN]  = 'DiagnosticWarn',
+      [vim.diagnostic.severity.INFO]  = 'DiagnosticInfo',
+      [vim.diagnostic.severity.HINT]  = 'DiagnosticHint',
+    }
+  },
+})
+
 -- set leader to space key
 g.mapleader = ' '
 g.localmapleader = ' '
 
 g.colorscheme = 'kanagawa'
--- this will load the variant 'dragon'
--- of the kanagawa colorscheme
--- g.colorscheme = { 'kanagawa', 'dragon' }
 
--- used by a auto command in 'config.autocmds.lua'
 -- will make 'scrolloff' and 'sidescrolloff' relative
 -- to window current width/height
 g.sidescrolloff = 0.25

@@ -87,6 +87,8 @@ function spec.config(_, opts)
       -- The following code creates a keymap to toggle inlay hints in your
       -- code, if the language server upports them
       if client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+        vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+
         nmap('<leader>lH', function()
           vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
         end, { desc = 'Toggle Inlay Hints' })
@@ -94,27 +96,18 @@ function spec.config(_, opts)
     end,
   })
 
-  --- Change diagnostic symbols in the sign column (gutter)
-  local signs = require('local.icons').diagnostics
-
-  for type, icon in pairs(signs) do
-    local hl = 'DiagnosticSign' .. type:gsub('^%l', string.upper)
-    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-  end
-  ---
-
-  --- languages serves
-  opts.servers = vim.tbl_deep_extend('force', opts.servers, {
-    lua_ls = {
-      settings = {
-        lua = { completion = { callSnippet = 'Replace' } },
-        diagnostics = { disable = { 'missing-fields' } },
-      },
-    },
-  })
+  -- --- languages serves
+  -- opts.servers = vim.tbl_deep_extend('force', opts.servers, {
+  --   lua_ls = {
+  --     settings = {
+  --       lua = { completion = { callSnippet = 'Replace' } },
+  --       diagnostics = { disable = { 'missing-fields' } },
+  --     },
+  --   },
+  -- })
 
   for server, config in pairs(opts.servers) do
-    config.capabilities = vim.tbl_extend('force', config.capabilities or {}, {
+    config.capabilities = vim.tbl_deep_extend('force', config.capabilities or {}, {
       textDocument = {
         foldingRange = { dynamicRegistration = false, lineFoldingOnly = true },
       },
