@@ -26,10 +26,12 @@ local lsp = {
 }
 
 lsp.opts.buf.format = {
-  filter = function(client)
-    -- format with `stylua`(null_ls) instead
-    return client.name ~= 'lua_ls'
-  end,
+  filter = {
+    function(client)
+      -- format with `stylua`(null_ls) instead
+      return client.name ~= 'lua_ls'
+    end,
+  },
 }
 
 lsp.opts.servers.lua_ls = {
@@ -54,7 +56,7 @@ lsp.opts.servers.lua_ls = {
 local blink = { 'saghen/blink.cmp', opts = {} }
 
 blink.opts.sources = {
-  default = 'lazydev',
+  default = { 'lazydev' },
   providers = {
     lazydev = { name = 'LazyDev', module = 'lazydev.integrations.blink' },
   },

@@ -1,7 +1,4 @@
-local spec = {
-  'nanozuki/tabby.nvim',
-  dependencies = 'nvim-tree/nvim-web-devicons',
-}
+local spec = { 'nanozuki/tabby.nvim' }
 
 spec.opts = {
   line = function(line)
