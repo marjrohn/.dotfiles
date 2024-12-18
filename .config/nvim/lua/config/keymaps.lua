@@ -7,8 +7,7 @@ local imap = helpers.map({ mode = 'i' })
 local xmap = helpers.map({ mode = 'x' })
 
 -- disabled mappings
-nmap('<leader>', '<nop>')
-nmap('q:', '<nop>')
+nmap({ '<leader>', 'q:', 'q/' }, '<nop>')
 
 -- better up/down
 map({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Down', expr = true })

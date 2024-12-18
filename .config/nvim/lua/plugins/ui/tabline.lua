@@ -46,19 +46,27 @@ spec.opts = {
       }
     end)
 
+    local severity = vim.diagnostic.severity
     local diag_count = vim.diagnostic.count(0)
-    local severity_list = { 'error', 'warn', 'info', 'hint' }
-
-    local diag_signs_segment = { ' ' }
-    for severity, type in ipairs(severity_list) do
-      if diag_count[severity] then
-        table.insert(diag_signs_segment, {
-          icons.diagnostics[type] .. ' ' .. diag_count[severity] .. ' ',
-          hl = 'Diagnostic' .. type:gsub('^%l', string.upper),
-        })
-      end
-    end
-
+    local diag_signs_segment = {
+      ' ',
+      diag_count[severity.ERROR] and {
+        string.format('%s %d ', icons.diagnostics.error, diag_count[severity.ERROR]),
+        hl = 'DiagnosticError',
+      } or '',
+      diag_count[severity.WARN] and {
+        string.format('%s %d ', icons.diagnostics.warn, diag_count[severity.WARN]),
+        hl = 'DiagnosticWarn',
+      } or '',
+      diag_count[severity.INFO] and {
+        string.format('%s %d ', icons.diagnostics.info, diag_count[severity.INFO]),
+        hl = 'DiagnosticInfo',
+      } or '',
+      diag_count[severity.HINT] and {
+        string.format('%s %d ', icons.diagnostics.hint, diag_count[severity.HINT]),
+        hl = 'DiagnosticHint',
+      } or '',
+    }
     return {
       hl = 'lualine_b_normal',
 

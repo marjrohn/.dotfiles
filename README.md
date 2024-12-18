@@ -35,12 +35,12 @@ function run() {
 run sudo "echo https://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories"
 run sudo "apk update && apk upgrade"
 run sudo "apk add \
-    stow make gcc rustup musl musl-dev openssl-dev openssl-libs-static \
-    python3 python3-dev py3-virtualenv py3-wheel py3-pip pipx \
+    stow make gcc musl musl-dev openssl-dev openssl-libs-static \
+    yazi yazi-cli file 7zip jq poppler imagemagick wl-clipboard \
     git lazygit zsh zoxide fzf bat eza fd ripgrep \
-    neovim lua5.1 luarocks5.1 lua-language-server \
-    yazi 7zip jq poppler imagemagick wl-clipboard \
-    kitty kitty-kitten mesa-egl"
+    neovim lua-language-server luarocks5.1 \
+    kitty kitty-kitten mesa-egl \
+    rustup pipx npm yarn"
 
 run "chsh -s /bin/zsh"
 
@@ -48,16 +48,18 @@ run "mkdir -p $CONTAINER_HOME/.local/bin $CONTAINER_HOME/.local/share"
 run "ln -s /usr/bin/luarocks-5.1 $CONTAINER_HOME/.local/bin/luarocks"
 run "ln -s $HOME/.local/share/fonts $CONTAINER_HOME/.local/share/fonts"
 
+run "rustup-init -y"
+run "$CONTAINER_HOME/.cargo/bin/rustup toolchain install nightly"
+run "$CONTAINER_HOME/.cargo/bin/cargo install \
+    cargo-update tree-sitter-cli stylua selene"
+
+run "distrobox-export \
+    --app kitty \
+    --extra-flags \"-d $CONTAINER_HOME\" \
+    --enter-flags \"-a \"--env SHELL=zsh\"\""
+
 run "git clone https://github.com/marjrohn/.dotfiles.git $CONTAINER_HOME/.dotfiles"
 run "cd $CONTAINER_HOME/.dotfiles && stow ."
-
-run "rustup-init -y"
-
-run "export PATH=$PATH:$CONTAINER_HOME/.cargo/bin && \
-	rustup toolchain install nightly && \
-	cargo install cargo-update tree-sitter-cli stylua selene"
-
-run "distrobox-export --app kitty"
 
 distrobox stop --yes $CONTAINER_NAME
 ```
@@ -69,6 +71,8 @@ sudo apk update && sudo apk upgrade
 rustup update
 cargo install-update -a
 pipx upgrade-all
+yarn global upgrade
+npm update --global
 nvim --headless "+Lazy! Sync" +qa
 ```
 

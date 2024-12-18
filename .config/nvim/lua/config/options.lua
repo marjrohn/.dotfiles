@@ -3,46 +3,22 @@
 local g = vim.g
 local opt = vim.opt
 
-vim.diagnostic.config({
-  virtual_text = false,
-  severity_sort = true,
-  -- stylua: ignore
-  signs = {
-    text = {
-      [vim.diagnostic.severity.ERROR] = require('local.icons').diagnostics.error,
-      [vim.diagnostic.severity.WARN]  = require('local.icons').diagnostics.warn,
-      [vim.diagnostic.severity.INFO]  = require('local.icons').diagnostics.info,
-      [vim.diagnostic.severity.HINT]  = require('local.icons').diagnostics.hint,
-    },
-    numhl = {
-      [vim.diagnostic.severity.ERROR] = 'DiagnosticError',
-      [vim.diagnostic.severity.WARN]  = 'DiagnosticWarn',
-      [vim.diagnostic.severity.INFO]  = 'DiagnosticInfo',
-      [vim.diagnostic.severity.HINT]  = 'DiagnosticHint',
-    }
-  },
-})
-
 -- set leader to space key
 g.mapleader = ' '
 g.localmapleader = ' '
 
 g.colorscheme = 'kanagawa'
 
--- will make 'scrolloff' and 'sidescrolloff' relative
+-- will make `scrolloff` and `sidescrolloff` relative
 -- to window current width/height
-g.sidescrolloff = 0.25
-g.scrolloff = 0.25
+g.sidescrolloff = 0.2 -- 20%
+g.scrolloff = 0.2
 
--- silent providers warning when running ':checkhealth'
+-- silent providers warning when running `:checkhealth`
 g.loaded_python3_provider = 0
 g.loaded_ruby_provider = 0
 g.loaded_perl_provider = 0
 g.loaded_node_provider = 0
-
--- fix markdown indentation settings and enable folding
-g.markdown_folding = 1
-g.markdown_recommended_style = 0
 
 -- enable auto save
 opt.autowriteall = true

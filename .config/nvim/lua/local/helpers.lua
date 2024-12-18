@@ -3,7 +3,7 @@ local M = {}
 function M.map(default_opts)
   default_opts = default_opts or {}
 
-  local mode = default_opts.mode
+  local _mode = default_opts.mode
   local key_list = default_opts.key_list
 
   default_opts.mode = nil
@@ -14,7 +14,11 @@ function M.map(default_opts)
   end
 
   local _map = function(mode, lhs, rhs, opts)
-    opts = vim.tbl_extend('keep', opts or {}, default_opts)
+    if type(lhs) ~= 'table' then
+      lhs = { lhs }
+    end
+
+    opts = vim.tbl_extend('force', default_opts, opts or {})
 
     if opts.silent == nil then
       opts.silent = true
@@ -26,17 +30,19 @@ function M.map(default_opts)
       opts.noremap = true
     end
 
-    if key_list then
-      opts.mode = mode
-      table.insert(key_list, { lhs, rhs, opts })
-    else
-      vim.keymap.set(mode, lhs, rhs, opts)
-    end
+    vim.iter(lhs):each(function(_lhs)
+      if key_list then
+        opts.mode = mode
+        table.insert(key_list, { _lhs, rhs, opts })
+      else
+        vim.keymap.set(mode, _lhs, rhs, opts)
+      end
+    end)
   end
 
-  if mode then
+  if _mode then
     return function(lhs, rhs, opts)
-      _map(mode, lhs, rhs, opts)
+      _map(_mode, lhs, rhs, opts)
     end
   end
 

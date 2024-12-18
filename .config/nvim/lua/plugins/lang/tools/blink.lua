@@ -13,35 +13,24 @@ local spec = {
   opts = {},
 }
 
-spec.opts.appereance = {
-  use_nvim_cmp_as_default = true,
-  nerd_font_variant = 'mono',
-}
-
+spec.opts.appearance = { use_nvim_cmp_as_default = true }
 spec.opts.completion = {
-  accept = {
-    auto_brackets = { enabled = true },
-  },
   documentation = {
     auto_show = true,
     auto_show_delay_ms = 200,
   },
   menu = {
-    draw = { treesitter = true },
+    draw = { treesitter = { 'lsp' } },
   },
-  trigger = { show_in_snippet = false },
+  trigger = {
+    show_in_snippet = false,
+  },
 }
-
+spec.opts.fuzzy = { prebuilt_binaries = { download = false } }
 spec.opts.keymap = { preset = 'super-tab' }
+spec.opts.sources = { default = { 'lsp', 'path', 'snippets', 'buffer' } }
 
-spec.opts.prebuild_binaries = { download = false }
-
-spec.opts.sources = {
-  default = { 'lsp', 'path', 'snippets', 'buffer' },
-  compat = {},
-}
-
-function spec.opts.config(_, opts)
+function spec.config(_, opts)
   -- setup compat sources
   local enabled = opts.sources.default
   for _, source in ipairs(opts.sources.compat or {}) do
@@ -56,21 +45,8 @@ function spec.opts.config(_, opts)
     end
   end
 
-  -- check if we need to override symbol kinds
-  for _, provider in pairs(opts.sources.providers or {}) do
-    if provider.kind then
-      require('blink.cmp.types').CompletionItemKind[provider.kind] = provider.kind
-      local transform_items = provider.transform_items
-
-      provider.transform_items = function(ctx, items)
-        items = transform_items and transform_items(ctx, items) or items
-        for _, item in ipairs(items) do
-          item.kind = provider.kind or item.kind
-        end
-        return items
-      end
-    end
-  end
+  -- Unset custom prop to pass blink.cmp validation
+  opts.sources.compat = nil
 
   require('blink.cmp').setup(opts)
 end

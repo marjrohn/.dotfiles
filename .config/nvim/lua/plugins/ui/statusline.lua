@@ -15,12 +15,14 @@ end
 
 local icons = require('local.icons')
 
-local section_b_cond = {}
-for _, nr in ipairs({ 106, 128 }) do
-  table.insert(section_b_cond, function()
-    return vim.o.columns >= nr and vim.bo.filetype ~= 'help'
+local section_b_cond = vim
+  .iter({ 96, 128 })
+  :map(function(nr)
+    return function()
+      return vim.o.columns >= nr
+    end
   end)
-end
+  :totable()
 
 spec.opts.options = {
   globalstatus = vim.o.laststatus == 3,

@@ -1,0 +1,24 @@
+[manager]
+ratio = [1, 3, 3]
+sort_by = "natural"
+sort_translint = true
+linemode = "mtime"
+show_symlink = false
+scrolloff = 2
+
+[preview]
+wrap = "yes"
+tab_size = 2
+
+[input]
+cursor_blink = true
+
+[which]
+sort_by = "key"
+
+[[plugin.prepend_fetchers]]
+id   = "mime"
+if   = "!(mime|dummy)"
+name = "*"
+run  = "mime-ext"
+prio = "high"

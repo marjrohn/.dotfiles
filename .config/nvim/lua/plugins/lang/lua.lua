@@ -3,16 +3,15 @@ local lazydev = {
     'folke/lazydev.nvim',
     ft = 'lua',
     opts = {
-      library = { { path = 'luvit-meta/library', words = { 'vim%.uv' } } },
+      library = {
+        { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+      },
     },
   },
   { 'Bilal2453/luvit-meta', lazy = true },
 }
 
 local treesitter = { 'nvim-treesitter/nvim-treesitter', opts = {} }
-local lsp = { 'neovim/nvim-lspconfig', opts = { servers = {} } }
-local cmp = { 'saghen/blink.cmp', opts = {} }
-local null_ls = { 'nvimtools/none-ls.nvim' }
 
 treesitter.opts.ensure_installed = {
   'lua',
@@ -20,25 +19,62 @@ treesitter.opts.ensure_installed = {
   'luadoc',
 }
 
+local lsp = {
+  'neovim/nvim-lspconfig',
+  ---@type LspOpts
+  opts = { buf = {}, servers = {} },
+}
+
+lsp.opts.buf.format = {
+  filter = function(client)
+    -- format with `stylua`(null_ls) instead
+    return client.name ~= 'lua_ls'
+  end,
+}
+
 lsp.opts.servers.lua_ls = {
   settings = {
-    lua = { completion = { callSnippet = 'Replace' } },
-    diagnostics = { disable = { 'missing-fields' } },
+    Lua = {
+      workspace = { checkThirdParty = false },
+      codeLens = { enable = true },
+      completion = { callSnippet = 'Replace' },
+      doc = { privateName = { '^_' } },
+      hint = {
+        enable = true,
+        setType = false,
+        paramType = true,
+        paramName = 'Disable',
+        semicolon = 'Disable',
+        arrayIndex = 'Disable',
+      },
+    },
   },
 }
 
-cmp.opts.sources = {
-  default = { 'lazydev' },
-  providers = { lazydev = { name = 'LazyDev', module = 'lazydev.integrations.blink' } },
+local blink = { 'saghen/blink.cmp', opts = {} }
+
+blink.opts.sources = {
+  default = 'lazydev',
+  providers = {
+    lazydev = { name = 'LazyDev', module = 'lazydev.integrations.blink' },
+  },
 }
 
-function null_ls.opts(_, opts)
-  opts.sources = opts.sources or {}
+local null_ls = { 'nvimtools/none-ls.nvim', opts = {} }
 
-  vim.list_extend(opts.sources, {
-    require('null-ls').builtins.formatting.stylua,
-    require('null-ls').builtins.diagnostics.selene,
-  })
-end
+null_ls.opts.root_markers = {
+  'selene.toml',
+  'stylua.toml',
+  '.stylua.toml',
+}
 
-return vim.list_extend(lazydev, { treesitter, lsp, cmp, null_ls })
+null_ls.opts.sources = {
+  function()
+    local formatting = require('null-ls').builtins.formatting
+    local diagnostics = require('null-ls').builtins.diagnostics
+
+    return { formatting.stylua, diagnostics.selene }
+  end,
+}
+
+return vim.list_extend(lazydev, { treesitter, lsp, blink, null_ls })
