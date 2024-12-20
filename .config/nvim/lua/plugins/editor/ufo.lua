@@ -121,7 +121,7 @@ function spec.config(_, opts)
     ufo.closeFoldsWith(vim.b.fold_level)
   end
 
-  local nmap = require('local.helpers').map({ mode = 'n' })
+  local nmap = require('local.helpers').mapping({ mode = 'n' })
   -- stylua: ignore start
   nmap('zR', open_all_folds,  { desc = 'Open All Folds' })
   nmap('zM', close_all_folds, { desc = 'Close All Folds' })

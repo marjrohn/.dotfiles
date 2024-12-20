@@ -9,10 +9,16 @@ local kanagawa = colorschemes['kanagawa']
 kanagawa.variants = { 'kanagawa-wave', 'kanagawa-dragon', 'kanagawa-lotus' }
 
 kanagawa.opts = {
-  compile = true,
-  terminalColors = not vim.o.termguicolors,
+  compile = false,
   colors = {
-    theme = { all = { ui = { bg_gutter = 'none' } } },
+    theme = {
+      all = {
+        ui = {
+          bg_gutter = 'none',
+          float = { bg = 'none', bg_border = 'none' },
+        },
+      },
+    },
   },
   background = { dark = 'dragon' },
   overrides = function(colors)
@@ -25,17 +31,7 @@ kanagawa.opts = {
 
     return {
       NormalDark = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
-
       LazyNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
-      MasonNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
-
-      -- TelescopeTitle = { fg = theme.ui.special, bold = true },
-      -- TelescopePromptNormal = { bg = theme.ui.bg_p1 },
-      -- TelescopePromptBorder = { fg = theme.ui.bg_p1, bg = theme.ui.bg_p1 },
-      -- TelescopeResultsNormal = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m1 },
-      -- TelescopeResultsBorder = { fg = theme.ui.bg_m1, bg = theme.ui.bg_m1 },
-      -- TelescopePreviewNormal = { bg = theme.ui.bg_dim },
-      -- TelescopePreviewBorder = { bg = theme.ui.bg_dim, fg = theme.ui.bg_dim },
 
       Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 },
       PmenuSel = { fg = 'NONE', bg = theme.ui.bg_p2 },

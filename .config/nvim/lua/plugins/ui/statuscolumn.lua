@@ -4,6 +4,7 @@ local spec = {
 }
 
 spec.opts.ft_ignore = { 'help', 'lazy', 'TelescopePrompt', 'undotree' }
+spec.opts.bt_ignore = { 'terminal' }
 
 function spec.config(_, opts)
   local builtin = require('statuscol.builtin')
@@ -42,7 +43,10 @@ function spec.config(_, opts)
   vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
     group = vim.api.nvim_create_augroup('Statuscol Fold', { clear = false }),
     callback = function(event)
-      if vim.tbl_contains(opts.ft_ignore or {}, vim.bo[event.buf].filetype) then
+      if
+        vim.tbl_contains(opts.ft_ignore or {}, vim.bo[event.buf].filetype)
+        or vim.tbl_contains(opts.bt_ignore or {}, vim.bo[event.buf].buftype)
+      then
         return
       end
 

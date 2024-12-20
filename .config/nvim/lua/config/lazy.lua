@@ -28,7 +28,7 @@ vim.opt.rtp:prepend(lazypath)
 ---
 
 --- keymaps
-local nmap = require('local.helpers').map({ mode = 'n' })
+local nmap = require('local.helpers').mapping({ mode = 'n' })
 
 -- stylua: ignore start
 nmap('<leader><cr><cr>', ':Lazy<cr>',         { desc = 'Lazy'    })
@@ -66,11 +66,11 @@ require('lazy').setup({
     border = 'rounded',
     title = ' Lazy ',
   },
-  checker = {
-    -- automatically check for plugin updates
-    enabled = true,
-    concurrency = 1,
-  },
+  -- checker = {
+  --   -- automatically check for plugin updates
+  --   enabled = true,
+  --   concurrency = 1,
+  -- },
   performance = {
     rtp = {
       disabled_plugins = {

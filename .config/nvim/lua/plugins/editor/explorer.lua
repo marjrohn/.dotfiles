@@ -12,7 +12,7 @@ mini_files.opts = {
   options = { use_as_default_explorer = false },
 }
 
-nmap = helpers.map({ mode = 'n', key_list = mini_files.keys })
+nmap = helpers.mapping({ mode = 'n', key_list = mini_files.keys })
 nmap('<leader>ef', function()
   require('mini.files').open(vim.api.nvim_buf_get_name(0), true)
 end, { desc = 'Open MiniFiles (file)' })
@@ -52,7 +52,7 @@ function mini_files.config(_, opts)
 end
 
 local yazi = { 'mikavilpas/yazi.nvim', opts = {}, keys = {} }
-nmap = helpers.map({ mode = 'n', key_list = yazi.keys })
+nmap = helpers.mapping({ mode = 'n', key_list = yazi.keys })
 
 nmap('<leader>ey', '<cmd>Yazi<cr>', { desc = 'Open Yazi (file)' })
 nmap('<leader>eY', '<cmd>yazi cwd<cr>', { desc = 'Open yazi (cwd)' })

@@ -5,7 +5,7 @@ return {
     local resession = require('resession')
     local helpers = require('local.helpers')
 
-    local map = helpers.map({ mode = 'n' })
+    local map = helpers.mapping({ mode = 'n' })
     local autocmd = helpers.autocmd
     local augroup = helpers.augroup
 

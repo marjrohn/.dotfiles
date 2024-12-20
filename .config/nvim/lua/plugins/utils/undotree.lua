@@ -2,7 +2,7 @@ return {
   'mbbill/undotree',
   lazy = false,
   config = function()
-    local nmap = require('local.helpers').map({ mode = 'n' })
+    local nmap = require('local.helpers').mapping({ mode = 'n' })
 
     -- stylua: ignore start
     nmap('<leader>ut', ':UndotreeToggle<cr>',      { desc = 'Toggle undotree' })

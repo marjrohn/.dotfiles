@@ -16,7 +16,7 @@ spec.opts = {
 
 function spec.config(_, opts)
   local notify = require('notify')
-  local nmap = require('local.helpers').map({ mode = 'n' })
+  local nmap = require('local.helpers').mapping({ mode = 'n' })
 
   notify.setup(opts)
   vim.notify = notify

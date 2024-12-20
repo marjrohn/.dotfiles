@@ -125,12 +125,12 @@ function spec.config(_, opts)
         vim.cmd.tcd(client.root_dir)
       end
 
-      local map = helpers.map({ buffer = event.buf })
-      local nmap = helpers.map({ mode = 'n', buffer = event.buf })
-      local imap = helpers.map({ mode = 'i', buffer = event.buf })
+      local map = helpers.mapping({ buffer = event.buf })
+      local nmap = helpers.mapping({ mode = 'n', buffer = event.buf })
+      local imap = helpers.mapping({ mode = 'i', buffer = event.buf })
 
       if client.supports_method(vim.lsp.protocol.Methods.textDocument_codeAction) then
-        map({ 'n', 'x' }, { '<f4>', 'gra', '<leader>la' }, function()
+        map({ 'n', 'x' }, { '<f3>', 'gra', '<leader>la' }, function()
           vim.lsp.buf.code_action(opts.buf.code_action)
         end, { desc = 'Code Action' })
       end
@@ -181,7 +181,7 @@ function spec.config(_, opts)
       end
 
       if client.supports_method(vim.lsp.protocol.Methods.textDocument_formatting) then
-        map({ 'n', 'x' }, { '<f3>', 'grf' }, function()
+        map({ 'n', 'x' }, { '<f4>', 'grf' }, function()
           vim.lsp.buf.format(opts.buf.format)
         end, { desc = 'Format' })
       end
@@ -197,7 +197,7 @@ function spec.config(_, opts)
       end
 
       if client.supports_method(vim.lsp.protocol.Methods.textDocument_rename) then
-        nmap({ 'grn', '<f2>', '<leader>lr' }, function()
+        nmap({ 'grn', '<f2>', '<leader>lrn' }, function()
           vim.lsp.buf.rename(nil, opts.buf.rename)
         end, { desc = 'Rename' })
       end
@@ -248,7 +248,7 @@ function spec.config(_, opts)
           })
         end
 
-        enable()
+        -- enable()
 
         nmap('<leader>tc', function()
           if is_enabled then

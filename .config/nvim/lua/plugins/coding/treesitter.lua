@@ -78,7 +78,7 @@ treesitter.opts = {
 function treesitter.config(_, opts)
   require('nvim-treesitter.configs').setup(opts)
 
-  local map = require('local.helpers').map({ mode = { 'n', 'x', 'o' } })
+  local map = require('local.helpers').mapping({ mode = { 'n', 'x', 'o' } })
   local ts_repeat_move = require('nvim-treesitter.textobjects.repeatable_move')
 
   -- repeat movement with ; and ,

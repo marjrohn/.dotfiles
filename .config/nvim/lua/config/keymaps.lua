@@ -1,10 +1,10 @@
 -- [[ General Keymappings ]]
 
 local helpers = require('local.helpers')
-local map = helpers.map()
-local nmap = helpers.map({ mode = 'n' })
-local imap = helpers.map({ mode = 'i' })
-local xmap = helpers.map({ mode = 'x' })
+local map = helpers.mapping()
+local nmap = helpers.mapping({ mode = 'n' })
+local imap = helpers.mapping({ mode = 'i' })
+local xmap = helpers.mapping({ mode = 'x' })
 
 -- disabled mappings
 nmap({ '<leader>', 'q:', 'q/' }, '<nop>')

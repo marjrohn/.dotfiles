@@ -1,6 +1,6 @@
 local M = {}
 
-function M.map(default_opts)
+function M.mapping(default_opts)
   default_opts = default_opts or {}
 
   local _mode = default_opts.mode
