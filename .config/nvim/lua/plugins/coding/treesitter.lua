@@ -2,6 +2,7 @@ local treesitter = {
   'nvim-treesitter/nvim-treesitter',
   build = ':TSUpdate',
   opts_extend = { 'ensure_installed' },
+  opts = {},
 }
 
 local spec = {
@@ -15,63 +16,72 @@ treesitter.opts = {
   auto_install = true,
   highlight = { enable = true },
   indent = { enable = true },
-  ensure_installed = {
-    'vim',
-    'vimdoc',
-    'bash',
-    'c',
-    'diff',
-    'printf',
-    'query',
-    'regex',
-    'markdown',
-    'markdown_inline',
-    'json',
-    'toml',
-    'html',
+  textobjects = {},
+}
+
+treesitter.opts.ensure_installed = {
+  'vim',
+  'vimdoc',
+  'bash',
+  'c',
+  'diff',
+  'printf',
+  'query',
+  'regex',
+  'markdown',
+  'markdown_inline',
+  'json',
+  'toml',
+  'html',
+}
+
+treesitter.opts.incremental_selection = {
+  enable = true,
+  keymaps = {
+    init_selection = '<c-space>',
+    node_incremental = '<c-space>',
+    scope_incremental = false,
+    node_decremental = '<bs>',
   },
-  incremental_selection = {
-    enable = true,
-    keymaps = {
-      init_selection = '<c-space>',
-      node_incremental = '<c-space>',
-      scope_incremental = false,
-      node_decremental = '<bs>',
-    },
+}
+
+local textobjects = treesitter.opts.textobjects
+
+textobjects.swap = {
+  enable = true,
+  swap_next = { ['<c-s-l>'] = '@parameter.inner' },
+  swap_previous = { ['<c-s-h>'] = '@parameter.inner' },
+}
+
+textobjects.move = {
+  enable = true,
+  goto_next_start = {
+    [']]'] = '@block.outer',
+    [']c'] = '@comment.outer',
+    [']a'] = '@parameter.inner',
+    [']f'] = '@function.outer',
+    [']m'] = '@class.outer',
   },
-  textobjects = {
-    swap = {
-      enable = true,
-      swap_next = { ['<a-l>'] = '@parameter.inner' },
-      swap_previous = { ['<a-h>'] = '@parameter.inner' },
-    },
-    move = {
-      enable = true,
-      goto_next_start = {
-        [']o'] = '@block.outer',
-        [']f'] = '@function.outer',
-        [']c'] = '@class.outer',
-        [']a'] = '@parameter.inner',
-      },
-      goto_next_end = {
-        [']O'] = '@block.outer',
-        [']F'] = '@function.outer',
-        [']C'] = '@class.outer',
-        [']A'] = '@parameter.inner',
-      },
-      goto_previous_start = {
-        ['[o'] = '@block.outer',
-        ['[f'] = '@function.outer',
-        ['[c'] = '@class.outer',
-        ['[a'] = '@parameter.inner',
-      },
-      goto_previous_end = {
-        ['[O'] = '@block.outer',
-        ['[F'] = '@function.outer',
-        ['[C'] = '@class.outer',
-        ['[A'] = '@parameter.inner',
-      },
-    },
+  goto_next_end = {
+    [']['] = '@block.outer',
+    [']C'] = '@comment.outer',
+    [']F'] = '@function.outer',
+    [']M'] = '@class.outer',
+    [']A'] = '@parameter.inner',
+  },
+  goto_previous_start = {
+    ['[['] = '@block.outer',
+    ['[c'] = '@comment.outer',
+    ['[f'] = '@function.outer',
+    ['[m'] = '@class.outer',
+    ['[a'] = '@parameter.inner',
+  },
+  goto_previous_end = {
+    ['[]'] = '@block.outer',
+    ['[C'] = '@comment.outer',
+    ['[F'] = '@function.outer',
+    ['[M'] = '@class.outer',
+    ['[A'] = '@parameter.inner',
   },
 }
 
@@ -83,7 +93,11 @@ function treesitter.config(_, opts)
 
   -- repeat movement with ; and ,
   map(';', ts_repeat_move.repeat_last_move, { desc = 'Repeat last move' })
-  map(',', ts_repeat_move.repeat_last_move_opposite, { desc = 'Repeat last move opposite' })
+  map(
+    ',',
+    ts_repeat_move.repeat_last_move_opposite,
+    { desc = 'Repeat last move opposite' }
+  )
 
   -- make builtin f, F, t, T also repeatable with ; and ,
   map('f', ts_repeat_move.builtin_f_expr, { expr = true })

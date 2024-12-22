@@ -53,13 +53,18 @@ kanagawa.opts = {
 --- setup plugin spec
 
 -- if not in the `colorchemes` table then try to load a builtin one
-if not vim.iter(colorschemes):any(function(name)
-  return name == vim.g.colorscheme
-end) then
+if
+  not vim.iter(colorschemes):any(function(name)
+    return name == vim.g.colorscheme
+  end)
+then
   local ok, _ = pcall(vim.cmd.colorscheme, 'vim.g.colorscheme')
 
   if not ok then
-    vim.notify(string.format("Invalid colorscheme: '%s'.", vim.g.colorscheme), vim.log.levels.WARN)
+    vim.notify(
+      string.format("Invalid colorscheme: '%s'.", vim.g.colorscheme),
+      vim.log.levels.WARN
+    )
   end
 end
 

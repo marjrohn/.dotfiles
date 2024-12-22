@@ -42,11 +42,12 @@ opt.cursorline = true
 opt.expandtab = true
 
 -- remove '~' char for empty lines and change fold chars
+-- TODO: move fold icons to `lua/local/icons.lua`
 opt.fillchars = {
   foldopen = '󰞘',
   foldclose = '󰞓',
   fold = ' ',
-  foldsep = '▎',
+  foldsep = '▏',
   diff = '╱',
   eob = ' ',
 }
@@ -54,6 +55,7 @@ opt.fillchars = {
 -- folding
 opt.foldenable = true
 opt.foldmethod = 'expr'
+-- TODO: change to lsp foldexpr when nvim-0.11 become stable
 opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 opt.foldcolumn = '1'
 opt.foldlevel = 99
@@ -92,6 +94,7 @@ opt.preserveindent = true
 opt.pumblend = 12
 
 -- make line numbers relative to current line
+-- also is needed to make statuscolumn update properly
 opt.relativenumber = true
 
 -- save and restore options
@@ -109,7 +112,7 @@ vim.opt.sessionoptions = {
   'winsize',
 }
 
--- round indentation with '>' ('<') to shiftwidth
+-- round indentation with `>` (and `<`) to shiftwidth
 opt.shiftround = true
 
 -- use the same value of 'tabstop' as indentation size
@@ -118,7 +121,7 @@ opt.shiftwidth = 0
 -- disable some startup messages
 opt.shortmess:append({ W = true, I = true, c = true, C = true })
 
--- always show signcolumn, otherwise it would shift the text each time
+-- always show signcolumn
 opt.signcolumn = 'yes'
 
 -- make search case-sensitive if pattern contain upper case letters

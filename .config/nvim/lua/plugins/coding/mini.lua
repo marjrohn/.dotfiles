@@ -1,61 +1,88 @@
-return {
-  {
-    'echasnovski/mini.ai',
-    opts = function()
-      local ai = require('mini.ai')
+local mini = {}
 
-      local opts = { n_lines = 500, custom_textobjects = {} }
+for _, name in ipairs({
+  'ai',
+  'align',
+  'bracketed',
+  'splitjoin',
+  'surround',
+  'extra',
+}) do
+  mini[name] = { 'echasnovski/mini.' .. name }
+end
 
-      -- word with case
-      opts.custom_textobjects.e = {
-        { '%u[%l%d]+%f[^%l%d]', '%f[%S][%l%d]+%f[^%l%d]', '%f[%P][%l%d]+%f[^%l%d]', '^[%l%d]+%f[^%l%d]' },
-        '^().*()$',
-      }
+mini.ai.opts = function()
+  local ai = require('mini.ai')
 
-      -- scope
-      opts.custom_textobjects.o = ai.gen_spec.treesitter({
-        a = { '@block.outer', '@conditional.outer', '@loop.outer' },
-        i = { '@block.inner', '@conditional.inner', '@loop.inner' },
-      })
+  local textobjects = {}
 
-      -- class
-      opts.custom_textobjects.c = ai.gen_spec.treesitter({
-        a = '@class.outer',
-        i = '@class.inner',
-      })
+  -- word with case
+  textobjects.e = {
+    {
+      '%u[%l%d]+%f[^%l%d]',
+      '%f[%S][%l%d]+%f[^%l%d]',
+      '%f[%P][%l%d]+%f[^%l%d]',
+      '^[%l%d]+%f[^%l%d]',
+    },
+    '^().*()$',
+  }
 
-      -- function
-      opts.custom_textobjects.f = ai.gen_spec.treesitter({
-        a = '@function.outer',
-        i = '@function.inner',
-      })
+  -- scope
+  textobjects.o = ai.gen_spec.treesitter({
+    a = { '@block.outer', '@conditional.outer', '@loop.outer' },
+    i = { '@block.inner', '@conditional.inner', '@loop.inner' },
+  })
 
-      -- parameter
-      opts.custom_textobjects.a = ai.gen_spec.treesitter({
-        a = '@parameter.outer',
-        i = '@parameter.inner',
-      })
+  -- class
+  textobjects.c = ai.gen_spec.treesitter({
+    a = '@class.outer',
+    i = '@class.inner',
+  })
 
-      -- tags
-      opts.custom_textobjects.t = ai.gen_spec.treesitter({
-        a = '@tag.outer',
-        i = '@tag.inner',
-      })
+  -- function
+  textobjects.f = ai.gen_spec.treesitter({
+    a = '@function.outer',
+    i = '@function.inner',
+  })
 
-      -- extra
-      local gen_ai_spec = require('mini.extra').gen_ai_spec
+  -- parameter
+  textobjects.a = ai.gen_spec.treesitter({
+    a = '@parameter.outer',
+    i = '@parameter.inner',
+  })
 
-      opts.custom_textobjects.g = gen_ai_spec.buffer()
-      opts.custom_textobjects.D = gen_ai_spec.diagnostic()
-      opts.custom_textobjects.i = gen_ai_spec.indent()
-      opts.custom_textobjects.d = gen_ai_spec.number()
-      --
+  -- tags
+  textobjects.t = ai.gen_spec.treesitter({
+    a = '@tag.outer',
+    i = '@tag.inner',
+  })
 
-      return opts
-    end,
-  },
-  { 'echasnovski/mini.align', config = true },
-  { 'echasnovski/mini.splitjoin', config = true },
-  { 'echasnovski/mini.surround', config = true },
-  { 'echasnovski/mini.extra' },
+  -- extra
+  local gen_ai_spec = require('mini.extra').gen_ai_spec
+
+  textobjects.g = gen_ai_spec.buffer()
+  textobjects.D = gen_ai_spec.diagnostic()
+  textobjects.i = gen_ai_spec.indent()
+  textobjects.d = gen_ai_spec.number()
+  --
+
+  return {
+    n_lines = 500,
+    custom_textobjects = textobjects,
+  }
+end
+
+mini.align.config = true
+
+mini.bracketed.opts = {
+  comment = { suffix = '' },
+  file = { suffix = '' },
+  treesitter = { suffix = '' },
 }
+
+mini.splitjoin.config = true
+mini.surround.config = true
+
+local specs = vim.tbl_values(mini)
+
+return specs

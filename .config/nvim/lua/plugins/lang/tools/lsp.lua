@@ -1,32 +1,32 @@
----@class CodeAction: vim.lsp.buf.code_action.Opts
----@field filter fun(x: lsp.CodeAction|lsp.Command):boolean?|fun(x: lsp.CodeAction|lsp.Command):boolean?[]?
+---@class LspConfig
+---@field buf LspConfig.buf?
+---@field capabilities lsp.ClientCapabilities?
+---@field diagnostic vim.diagnostic.Opts?
+---@field servers table<string, LspConfig.servers>?
 
----@class Format: vim.lsp.buf.format.Opts
----@field filter fun(client: vim.lsp.Client):boolean?|fun(client: vim.lsp.Client):boolean?[]?
-
----@class Rename: vim.lsp.buf.rename.Opts
----@field filter fun(client: vim.lsp.Client): boolean?|fun(client: vim.lsp.Client): boolean?[]?
-
----@class Buf
----@field code_action CodeAction?
+---@class LspConfig.buf
+---@field code_action LspConfig.buf.code_action?
 ---@field declaration vim.lsp.LocationOpts?
 ---@field definition vim.lsp.LocationOpts?
 ---@field document_symbol vim.lsp.ListOpts?
----@field format Format?
+---@field format LspConfig.buf.format?
 ---@field implementation vim.lsp.LocationOpts?
 ---@field references vim.lsp.ListOpts?
----@field rename Rename?
+---@field rename LspConfig.buf.rename?
 ---@field type_definition vim.lsp.LocationOpts?
 ---@field workspace_symbol vim.lsp.ListOpts?
 
----@class Server: vim.lsp.ClientConfig
----@field cmd (string[]|fun(dispatchers: vim.lsp.rpc.Dispatchers): vim.lsp.rpc.PublicClient)?
+---@class LspConfig.buf.code_action: vim.lsp.buf.code_action.Opts
+---@field filter fun(x: lsp.CodeAction|lsp.Command):boolean?[]?
 
----@class LspOpts
----@field buf Buf?
----@field capabilities lsp.ClientCapabilities?
----@field diagnostic vim.diagnostic.Opts?
----@field servers table<string, Server>?
+---@class LspConfig.buf.format: vim.lsp.buf.format.Opts
+---@field filter fun(client: vim.lsp.Client):boolean?[]?
+
+---@class LspConfig.buf.rename: vim.lsp.buf.rename.Opts
+---@field filter fun(client: vim.lsp.Client): boolean?[]?
+
+---@class LspConfig.servers: vim.lsp.ClientConfig
+---@field cmd (string[]|fun(dispatchers: vim.lsp.rpc.Dispatchers): vim.lsp.rpc.PublicClient)?
 
 local spec = {
   'neovim/nvim-lspconfig',
@@ -39,7 +39,7 @@ local spec = {
     'buf.format.filter',
     'buf.rename.filter',
   },
-  ---@type LspOpts
+  ---@type LspConfig
   opts = {},
 }
 
@@ -112,162 +112,156 @@ function spec.config(_, opts)
     end
   end
 
-  autocmd('LspAttach', {
-    group = augroup('lsp_attach'),
-    callback = function(event)
-      local client = vim.lsp.get_client_by_id(event.data.client_id)
-      if not client then
-        return
-      end
+  local function lsp_attach(event)
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
 
-      -- set current directory for current tab
-      if client.root_dir then
-        vim.cmd.tcd(client.root_dir)
-      end
+    if not client then
+      return
+    end
 
-      local map = helpers.mapping({ buffer = event.buf })
-      local nmap = helpers.mapping({ mode = 'n', buffer = event.buf })
-      local imap = helpers.mapping({ mode = 'i', buffer = event.buf })
+    -- set current directory for current tab
+    if client.root_dir then
+      vim.cmd.tcd(client.root_dir)
+    end
 
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_codeAction) then
-        map({ 'n', 'x' }, { '<f3>', 'gra', '<leader>la' }, function()
-          vim.lsp.buf.code_action(opts.buf.code_action)
-        end, { desc = 'Code Action' })
-      end
+    local map = helpers.mapping({ buffer = event.buf })
+    local nmap = helpers.mapping({ mode = 'n', buffer = event.buf })
+    local imap = helpers.mapping({ mode = 'i', buffer = event.buf })
 
-      -- the following two autocommands are used to highlight references of the
-      -- word under your cursor when your cursor rests there for a little while.
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
-        local highlight_augroup = augroup('lsp_highlight', false)
+    -- the following two autocommands are used to highlight references of the
+    -- word under your cursor when your cursor rests there for a little while.
+    if
+      client.supports_method(
+        vim.lsp.protocol.Methods.textDocument_documentHighlight
+      )
+    then
+      local highlight_augroup = augroup('lsp_highlight', false)
 
-        autocmd({ 'CursorHold', 'CursorHoldI' }, {
-          buffer = event.buf,
-          group = highlight_augroup,
-          callback = vim.lsp.buf.document_highlight,
-        })
+      autocmd({ 'CursorHold', 'CursorHoldI' }, {
+        buffer = event.buf,
+        group = highlight_augroup,
+        callback = vim.lsp.buf.document_highlight,
+      })
 
-        autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-          buffer = event.buf,
-          group = highlight_augroup,
-          callback = vim.lsp.buf.clear_references,
-        })
+      autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+        buffer = event.buf,
+        group = highlight_augroup,
+        callback = vim.lsp.buf.clear_references,
+      })
 
-        autocmd('LspDetach', {
-          group = augroup('lsp_detach'),
-          callback = function(_event)
-            vim.lsp.buf.clear_references()
-            vim.api.nvim_clear_autocmds({ group = highlight_augroup, buffer = _event.buf })
-          end,
-        })
-      end
-
-      -- keymaps
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_declaration) then
-        nmap('gd', function()
-          vim.lsp.buf.declaration(opts.buf.declaration)
-        end, { desc = 'Goto Declaration' })
-      end
-
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_definition) then
-        nmap('gD', function()
-          vim.lsp.buf.definition(opts.buf.definition)
-        end, { desc = 'Goto Definition' })
-      end
-
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_documentSymbol) then
-        nmap('gO', function()
-          vim.lsp.buf.document_symbol(opts.buf.document_symbol)
-        end, { desc = 'Document Symbols' })
-      end
-
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_formatting) then
-        map({ 'n', 'x' }, { '<f4>', 'grf' }, function()
-          vim.lsp.buf.format(opts.buf.format)
-        end, { desc = 'Format' })
-      end
-
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_hover) then
-        nmap('K', vim.lsp.buf.hover, { desc = 'Symbol Hover' })
-      end
-
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_implementation) then
-        nmap('gri', function()
-          vim.lsp.buf.implementation(opts.buf.implementation)
-        end, { desc = 'Goto Implementations' })
-      end
-
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_rename) then
-        nmap({ 'grn', '<f2>', '<leader>lrn' }, function()
-          vim.lsp.buf.rename(nil, opts.buf.rename)
-        end, { desc = 'Rename' })
-      end
-
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_references) then
-        nmap('grr', function()
-          vim.lsp.buf.references(opts.buf.references)
-        end, { desc = 'Goto References' })
-      end
-
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_signatureHelp) then
-        imap('<c-s>', vim.lsp.buf.signature_help, { desc = 'Signature Help' })
-      end
-
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_typeDefinition) then
-        nmap('go', function()
-          vim.lsp.buf.type_definition(opts.buf.type_definition)
-        end, { desc = 'Type Definitions' })
-      end
-
-      if client.supports_method(vim.lsp.protocol.Methods.workspace_symbol) then
-        nmap('grw', function()
-          vim.lsp.buf.workspace_symbol(nil, opts.buf.workspace_symbol)
-        end)
-      end
-
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_codeLens) then
-        local codelens_augroup = augroup('lsp_codelens', false)
-        local is_enabled = false
-
-        local function enable()
-          vim.lsp.codelens.refresh()
-          is_enabled = true
-
-          autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
-            group = codelens_augroup,
-            buffer = event.buf,
-            callback = vim.lsp.codelens.refresh,
-          })
-        end
-
-        local function disable()
-          vim.lsp.codelens.clear()
-          is_enabled = false
+      autocmd('LspDetach', {
+        group = augroup('lsp_detach'),
+        callback = function(_event)
+          vim.lsp.buf.clear_references()
           vim.api.nvim_clear_autocmds({
-            group = 'lsp_codelens',
-            buffer = event.buf,
+            group = highlight_augroup,
+            buffer = _event.buf,
           })
+        end,
+      })
+    end
+
+    -- keymaps
+    map({ 'n', 'x' }, { '<f3>', 'gra', '<leader>la' }, function()
+      vim.lsp.buf.code_action(opts.buf.code_action)
+    end, { desc = 'Code Action' })
+
+    nmap('gd', function()
+      vim.lsp.buf.declaration(opts.buf.declaration)
+    end, { desc = 'Goto Declaration' })
+
+    nmap('gD', function()
+      vim.lsp.buf.definition(opts.buf.definition)
+    end, { desc = 'Goto Definition' })
+
+    nmap('gO', function()
+      vim.lsp.buf.document_symbol(opts.buf.document_symbol)
+    end, { desc = 'Document Symbols' })
+
+    map({ 'n', 'x' }, { '<f4>', 'grf', '<leader>lf' }, function()
+      vim.lsp.buf.format(opts.buf.format)
+    end, { desc = 'Format' })
+
+    nmap('K', vim.lsp.buf.hover, { desc = 'Symbol Hover' })
+
+    nmap('gri', function()
+      vim.lsp.buf.implementation(opts.buf.implementation)
+    end, { desc = 'Goto Implementations' })
+
+    nmap({ 'grn', '<f2>', '<leader>lrn' }, function()
+      vim.lsp.buf.rename(nil, opts.buf.rename)
+    end, { desc = 'Rename' })
+
+    nmap('grr', function()
+      vim.lsp.buf.references(opts.buf.references)
+    end, { desc = 'Goto References' })
+
+    imap('<c-s>', vim.lsp.buf.signature_help, { desc = 'Signature Help' })
+
+    nmap('go', function()
+      vim.lsp.buf.type_definition(opts.buf.type_definition)
+    end, { desc = 'Type Definitions' })
+
+    nmap('grw', function()
+      vim.lsp.buf.workspace_symbol(nil, opts.buf.workspace_symbol)
+    end)
+
+    -- toggle codelens
+    if
+      client.supports_method(vim.lsp.protocol.Methods.textDocument_codeLens)
+    then
+      local codelens_augroup = augroup('lsp_codelens', false)
+      local is_enabled = false
+
+      local function enable()
+        vim.lsp.codelens.refresh()
+        is_enabled = true
+
+        autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+          group = codelens_augroup,
+          buffer = event.buf,
+          callback = vim.lsp.codelens.refresh,
+        })
+      end
+
+      local function disable()
+        vim.lsp.codelens.clear()
+        is_enabled = false
+
+        vim.api.nvim_clear_autocmds({
+          group = codelens_augroup,
+          buffer = event.buf,
+        })
+      end
+
+      -- uncomment this to enable on attach
+      -- enable()
+
+      nmap('<leader>tc', function()
+        if is_enabled then
+          disable()
+        else
+          enable()
         end
+      end, { desc = 'Toggle Codelens' })
+    end
 
-        -- enable()
+    -- toogle inlay hints
+    if
+      client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint)
+    then
+      -- remove this to not enable on attack
+      vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
 
-        nmap('<leader>tc', function()
-          if is_enabled then
-            disable()
-          else
-            enable()
-          end
-        end, { desc = 'Toggle Codelens' })
-      end
+      nmap('<leader>th', function()
+        vim.lsp.inlay_hint.enable(
+          not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf })
+        )
+      end, { desc = 'Toggle Inlay Hints' })
+    end
+  end
 
-      if client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-        vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
-
-        nmap('<leader>th', function()
-          vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
-        end, { desc = 'Toggle Inlay Hints' })
-      end
-    end,
-  })
+  autocmd('LspAttach', { group = augroup('lsp_attach'), callback = lsp_attach })
 
   vim.diagnostic.config(opts.diagnostic)
 

@@ -61,14 +61,20 @@ function spec.config(_, opts)
         cursor_fold.level = 0
         cursor_fold.start = -1
         cursor_fold.end_ = -1
-      elseif line < cursor_fold.start or line > cursor_fold.end_ or foldlevel ~= cursor_fold.level then
+      elseif
+        line < cursor_fold.start
+        or line > cursor_fold.end_
+        or foldlevel ~= cursor_fold.level
+      then
         local ufo_available, fold_ = pcall(require, 'ufo.fold')
 
         if ufo_available then
           fold_ = fold_.get(event.buf)
-          local folds = vim.iter(fold_ and fold_.foldRanges or {}):map(function(fold)
-            return { start = fold.startLine + 1, end_ = fold.endLine + 1 }
-          end)
+          local folds = vim
+            .iter(fold_ and fold_.foldRanges or {})
+            :map(function(fold)
+              return { start = fold.startLine + 1, end_ = fold.endLine + 1 }
+            end)
 
           folds = folds:filter(function(fold)
             return fold.start <= line and line <= fold.end_
@@ -133,39 +139,20 @@ function spec.config(_, opts)
 
   table.insert(opts.segments, {
     text = {
-      function(args, segment)
-        local buf = vim.api.nvim_win_get_buf(args.win)
-        local hl
-        if
-          vim.iter(vim.fn.sign_getplaced(buf, { group = '*', lnum = args.lnum })[1].signs):any(function(sign)
-            local ns_id = vim.api.nvim_get_namespaces()[sign.group]
+      function(args)
+        local hl = get_hl(args)
 
-            if not ns_id then
-              return false
-            end
-
-            local extmark = vim.api.nvim_buf_get_extmark_by_id(buf, ns_id, sign.id, { details = true })
-
-            return extmark[3].number_hl_group and true or false
-          end)
-        then
-          hl = ''
-        else
-          hl = get_hl(args)
-        end
-
-        if args.sclnu and segment.sign and segment.sign.wins[args.win].signs[args.lnum] then
-          return '%=' .. builtin.signfunc(args, segment)
-        end
-
-        if not args.rnu and not args.nu then
+        if not (args.rnu or args.nu) then
           return ''
         end
+
         if args.virtnum ~= 0 then
           return '%='
         end
 
-        local lnum = args.rnu and (args.relnum > 0 and args.relnum or (args.nu and args.lnum or 0)) or args.lnum
+        local lnum = args.rnu
+            and (args.relnum > 0 and args.relnum or (args.nu and args.lnum or 0))
+          or args.lnum
 
         if args.relnum == 0 and args.rnu then
           return hl .. lnum .. '%='
@@ -204,7 +191,10 @@ function spec.config(_, opts)
           symbol = args.fold.open
         end
 
-        if foldclosed or (args.lnum >= cursor_fold.start and args.lnum <= cursor_fold.end_) then
+        if
+          foldclosed
+          or (args.lnum >= cursor_fold.start and args.lnum <= cursor_fold.end_)
+        then
           hl = '%#Normal#'
         else
           hl = get_hl(args)

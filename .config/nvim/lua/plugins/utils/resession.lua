@@ -39,7 +39,11 @@ return {
           local ok, _ = pcall(session_load, 'last')
 
           if not ok then
-            vim.notify("Could not load session 'last'", vim.log.levels.WARN, { title = 'Resession' })
+            vim.notify(
+              "Could not load session 'last'",
+              vim.log.levels.WARN,
+              { title = 'Resession' }
+            )
           end
         end
       end,

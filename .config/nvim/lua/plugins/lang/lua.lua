@@ -21,7 +21,7 @@ treesitter.opts.ensure_installed = {
 
 local lsp = {
   'neovim/nvim-lspconfig',
-  ---@type LspOpts
+  ---@type LspConfig
   opts = { buf = {}, servers = {} },
 }
 

@@ -8,7 +8,12 @@ M.get_mode = function()
   end
 
   -- '\22' is CTRL-V (see `h: nvim_replace_termcodes()`)
-  if vim.list_contains({ 'v', 'vs', 'V', 'Vs', '\22', '\22s', 's', 'S', 'CTRL-S' }, mode) then
+  if
+    vim.list_contains(
+      { 'v', 'vs', 'V', 'Vs', '\22', '\22s', 's', 'S', 'CTRL-S' },
+      mode
+    )
+  then
     return 'visual'
   end
 
@@ -65,7 +70,14 @@ function M.gen_lualine_theme(colorscheme)
   local fg_text = _theme.normal.b.fg
   local fg_muted = _theme.inactive.a.fg
 
-  for _, mode in ipairs({ 'normal', 'insert', 'visual', 'replace', 'command', 'inactive' }) do
+  for _, mode in ipairs({
+    'normal',
+    'insert',
+    'visual',
+    'replace',
+    'command',
+    'inactive',
+  }) do
     modes[mode] = _theme[mode].a.bg
   end
 

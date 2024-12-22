@@ -4,18 +4,10 @@ local spec = {
   opts = {},
 }
 
-function spec.init()
-  vim.opt.showmode = false
-  vim.opt.fillchars = vim.tbl_extend('force', vim.opt.fillchars:get(), {
-    stl = '󱘹',
-    stlnc = '󱘹',
-  })
-end
-
 local icons = require('local.icons')
 
 local section_b_cond = vim
-  .iter({ 96, 128 })
+  .iter({ 95, 125 })
   :map(function(nr)
     return function()
       return vim.o.columns >= nr
@@ -91,6 +83,12 @@ spec.opts.sections.lualine_z = {
 }
 
 function spec.config(_, opts)
+  vim.opt.showmode = false
+  vim.opt.fillchars = vim.tbl_extend('force', vim.opt.fillchars:get(), {
+    stl = '━',
+    stlnc = '━',
+  })
+
   opts = vim.tbl_deep_extend('force', opts, {
     options = {
       theme = require('local.theme').gen_lualine_theme(),

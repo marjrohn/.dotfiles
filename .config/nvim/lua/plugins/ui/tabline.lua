@@ -48,19 +48,35 @@ spec.opts = {
     local diag_signs_segment = {
       ' ',
       diag_count[severity.ERROR] and {
-        string.format('%s %d ', icons.diagnostics.error, diag_count[severity.ERROR]),
+        string.format(
+          '%s %d ',
+          icons.diagnostics.error,
+          diag_count[severity.ERROR]
+        ),
         hl = 'DiagnosticError',
       } or '',
       diag_count[severity.WARN] and {
-        string.format('%s %d ', icons.diagnostics.warn, diag_count[severity.WARN]),
+        string.format(
+          '%s %d ',
+          icons.diagnostics.warn,
+          diag_count[severity.WARN]
+        ),
         hl = 'DiagnosticWarn',
       } or '',
       diag_count[severity.INFO] and {
-        string.format('%s %d ', icons.diagnostics.info, diag_count[severity.INFO]),
+        string.format(
+          '%s %d ',
+          icons.diagnostics.info,
+          diag_count[severity.INFO]
+        ),
         hl = 'DiagnosticInfo',
       } or '',
       diag_count[severity.HINT] and {
-        string.format('%s %d ', icons.diagnostics.hint, diag_count[severity.HINT]),
+        string.format(
+          '%s %d ',
+          icons.diagnostics.hint,
+          diag_count[severity.HINT]
+        ),
         hl = 'DiagnosticHint',
       } or '',
     }

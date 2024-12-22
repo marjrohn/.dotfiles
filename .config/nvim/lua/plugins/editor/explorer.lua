@@ -46,7 +46,11 @@ function mini_files.config(_, opts)
     pattern = 'MiniFilesBufferCreate',
     callback = function(event)
       local buf_id = event.data.buf_id
-      nmap('g.', toggle_dotfiles, { buffer = buf_id, desc = 'Toggle Hidden Files' })
+      nmap(
+        'g.',
+        toggle_dotfiles,
+        { buffer = buf_id, desc = 'Toggle Hidden Files' }
+      )
     end,
   })
 end
