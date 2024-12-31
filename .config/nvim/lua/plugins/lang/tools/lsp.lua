@@ -2,6 +2,7 @@
 ---@field buf LspConfig.buf?
 ---@field capabilities lsp.ClientCapabilities?
 ---@field diagnostic vim.diagnostic.Opts?
+---@field handlers table<string, function>?
 ---@field servers table<string, LspConfig.servers>?
 
 ---@class LspConfig.buf
@@ -90,6 +91,18 @@ spec.opts.diagnostic = {
   underline = true,
   update_in_insert = false,
   virtual_text = true,
+}
+
+-- global handlers options
+spec.opts.handlers = {
+  ['textDocument/hover'] = vim.lsp.with(
+    vim.lsp.handlers.hover,
+    { border = 'rounded' }
+  ),
+  ['textDocument/signatureHelp'] = vim.lsp.with(
+    vim.lsp.handlers.signature_help,
+    { border = 'rounded' }
+  ),
 }
 
 -- server configuration
@@ -269,6 +282,9 @@ function spec.config(_, opts)
     config.capabilities = require('blink.cmp').get_lsp_capabilities(
       vim.tbl_deep_extend('force', opts.capabilities, config.capabilities or {})
     )
+
+    config.handlers =
+      vim.tbl_deep_extend('force', opts.handlers, config.handlers or {})
 
     require('lspconfig')[server].setup(config)
   end

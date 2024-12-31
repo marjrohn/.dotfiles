@@ -6,6 +6,7 @@ local spec = {
 
 spec.opts.defaults = {
   formatter = 'path.filename_first',
+  no_header = true,
 }
 
 spec.opts.keymap = {
