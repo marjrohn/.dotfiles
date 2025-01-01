@@ -1,9 +1,10 @@
 [manager]
-ratio = [1, 3, 3]
+ratio = [1, 3, 4]
 sort_by = "natural"
 sort_translint = true
-linemode = "mtime"
+sort_dir_first = true
 show_symlink = false
+show_hidden = true
 scrolloff = 2
 
 [preview]
@@ -17,8 +18,11 @@ cursor_blink = true
 sort_by = "key"
 
 [[plugin.prepend_fetchers]]
-id   = "mime"
-if   = "!(mime|dummy)"
+id   = "git"
 name = "*"
-run  = "mime-ext"
-prio = "high"
+run  = "git"
+
+[[plugin.prepend_fetchers]]
+id   = "git"
+name = "*/"
+run  = "git"

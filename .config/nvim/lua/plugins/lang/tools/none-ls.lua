@@ -16,8 +16,7 @@ spec.opts = {
 }
 
 function spec.config(_, opts)
-  opts.root_dir = opts.root_dir
-    or require('null-ls.utils').root_pattern(opts.root_markers)
+  opts.root_dir = opts.root_dir or require('null-ls.utils').root_pattern(opts.root_markers)
 
   opts.root_markers = nil
 

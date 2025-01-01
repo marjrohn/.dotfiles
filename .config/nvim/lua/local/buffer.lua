@@ -9,33 +9,33 @@ end
 
 function M.buf_remove(buf)
   local buflist = M.buf_list()
-  local current_buf = vim.api.nvim_get_current_buf()
 
   if buf == nil or buf == 0 then
-    buf = current_buf
-  elseif not vim.api.nvim_buf_is_valid(buf) then
-    return
-  end
-
-  if not vim.list_contains(buflist, buf) then
-    return
-  end
-
-  if #buflist == 1 and vim.api.nvim_buf_get_name(buf) == '' then
-    return
-  end
-
-  if buf ~= current_buf then
-    vim.api.nvim_buf_delete(buf, {})
+    buf = vim.api.nvim_get_current_buf()
+  elseif not vim.list_contains(buflist, buf) then
     return
   end
 
   if #buflist == 1 then
-    vim.cmd('enew')
-  elseif buf == buflist[1] then
-    vim.cmd('bnext')
+    if vim.api.nvim_buf_get_name(buf) ~= '' then
+      vim.api.nvim_win_set_buf(0, vim.api.nvim_create_buf(true, false))
+    else
+      return
+    end
   else
-    vim.cmd('bprevious')
+    local number = vim
+      .iter(ipairs(buflist))
+      :map(function(n, _buf)
+        if _buf == buf then
+          return n
+        end
+      end)
+      :next()
+
+    number = number - 1
+    number = (number > 0) and number or #buflist
+
+    vim.api.nvim_win_set_buf(0, buflist[number])
   end
 
   vim.api.nvim_buf_delete(buf, {})

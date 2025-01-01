@@ -13,11 +13,7 @@ if vim.env.TERM == 'xterm-kitty' then
   autocmd({ 'VimEnter', 'VimResume' }, {
     group = augroup('kitty_padding_disable'),
     callback = function()
-      vim.cmd(
-        'silent !'
-          .. kitty_cmd
-          .. ' @ --to=$KITTY_LISTEN_ON set-spacing padding=0'
-      )
+      vim.cmd('silent !' .. kitty_cmd .. ' @ --to=$KITTY_LISTEN_ON set-spacing padding=0')
     end,
   })
 
@@ -26,9 +22,7 @@ if vim.env.TERM == 'xterm-kitty' then
     group = augroup('kitty_padding_enable'),
     callback = function()
       vim.cmd(
-        'silent !'
-          .. kitty_cmd
-          .. ' @ --to=$KITTY_LISTEN_ON set-spacing padding=default'
+        'silent !' .. kitty_cmd .. ' @ --to=$KITTY_LISTEN_ON set-spacing padding=default'
       )
     end,
   })
@@ -68,10 +62,7 @@ autocmd('BufReadPost', {
   callback = function(event)
     local exclude = { 'gitcommit' }
     local buf = event.buf
-    if
-      vim.tbl_contains(exclude, vim.bo[buf].filetype)
-      or vim.b[buf].cursor_last_loc
-    then
+    if vim.tbl_contains(exclude, vim.bo[buf].filetype) or vim.b[buf].cursor_last_loc then
       return
     end
     vim.b[buf].cursor_last_loc = true
