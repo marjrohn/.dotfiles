@@ -13,11 +13,7 @@ if vim.env.TERM == 'xterm-kitty' then
   autocmd({ 'VimEnter', 'VimResume' }, {
     group = augroup('kitty_padding_disable'),
     callback = function()
-      vim.cmd(
-        'silent !'
-          .. kitty_cmd
-          .. ' @ --to=$KITTY_LISTEN_ON set-spacing padding=0'
-      )
+      vim.cmd('silent !' .. kitty_cmd .. ' @ --to=$KITTY_LISTEN_ON set-spacing padding=0')
     end,
   })
 
@@ -26,9 +22,7 @@ if vim.env.TERM == 'xterm-kitty' then
     group = augroup('kitty_padding_enable'),
     callback = function()
       vim.cmd(
-        'silent !'
-          .. kitty_cmd
-          .. ' @ --to=$KITTY_LISTEN_ON set-spacing padding=default'
+        'silent !' .. kitty_cmd .. ' @ --to=$KITTY_LISTEN_ON set-spacing padding=default'
       )
     end,
   })
@@ -68,10 +62,7 @@ autocmd('BufReadPost', {
   callback = function(event)
     local exclude = { 'gitcommit' }
     local buf = event.buf
-    if
-      vim.tbl_contains(exclude, vim.bo[buf].filetype)
-      or vim.b[buf].cursor_last_loc
-    then
+    if vim.tbl_contains(exclude, vim.bo[buf].filetype) or vim.b[buf].cursor_last_loc then
       return
     end
     vim.b[buf].cursor_last_loc = true
@@ -153,19 +144,18 @@ autocmd({ 'BufWritePre' }, {
   end,
 })
 
--- dont insert comment leader when add a new line with 'o' or 'O'
+-- disable auto-wrap when editing on comments
+-- also do not insert comment leader on newlines
 autocmd('FileType', {
   group = augroup('no_auto_comment'),
-  callback = function()
-    vim.opt_local.formatoptions:remove('o')
-  end,
+  command = "setlocal formatoptions-=cro"
 })
 
 -- make 'scrolloff' and 'sidescrolloff' relative
 autocmd({ 'BufWinEnter', 'WinEnter', 'WinResized' }, {
   group = augroup('win_scrolloff'),
   callback = function()
-    local update_scrolloff = function(win)
+    local function update_scrolloff(win)
       local w = vim.api.nvim_win_get_width(win)
       local h = vim.api.nvim_win_get_height(win)
 

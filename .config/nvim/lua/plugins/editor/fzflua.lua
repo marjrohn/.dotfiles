@@ -32,6 +32,10 @@ spec.opts.fzf_opts = {
   ['--no-scrollbar'] = true,
 }
 
+spec.opts.files = {
+  cwd_prompt = false,
+}
+
 spec.opts.grep = {
   rg_glob = true,
   glob_flag = '--iglob',
@@ -71,8 +75,7 @@ spec.opts.ui_select = function(opts, items)
     opts.winopts = {
       layout = 'vertical',
       -- height is number of items minus 15 lines for the preview, with a max of 80% screen height
-      height = math.floor(math.min(vim.o.lines * 0.8 - 16, #items + 2) + 0.5)
-        + 16,
+      height = math.floor(math.min(vim.o.lines * 0.8 - 16, #items + 2) + 0.5) + 16,
       width = 0.6,
       preview = {
         layout = 'vertical',
@@ -87,9 +90,7 @@ spec.opts.ui_select = function(opts, items)
     }
   end
 
-  opts.winopts.title = ' '
-    .. vim.trim((prompt or 'Select'):gsub('%s*:%s*$', ''))
-    .. ' '
+  opts.winopts.title = ' ' .. vim.trim((prompt or 'Select'):gsub('%s*:%s*$', '')) .. ' '
   opts.winopts.title_pos = 'center'
 
   return opts
@@ -112,11 +113,8 @@ function spec.config(_, opts)
       return t
     end
 
-    opts = vim.tbl_deep_extend(
-      'force',
-      fix(require('fzf-lua.profiles.default-title')),
-      opts
-    )
+    opts =
+      vim.tbl_deep_extend('force', fix(require('fzf-lua.profiles.default-title')), opts)
     opts[1] = nil
   end
 

@@ -21,11 +21,7 @@ function spec.config(_, opts)
   notify.setup(opts)
   vim.notify = notify
 
-  nmap(
-    '<leader>nn',
-    '<cmd>Notifications<cr>',
-    { desc = 'Show Notifications Log' }
-  )
+  nmap('<leader>nn', '<cmd>Notifications<cr>', { desc = 'Show Notifications Log' })
 
   nmap('<leader>nd', function()
     notify.dismiss({ silent = true, pending = true })

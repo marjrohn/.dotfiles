@@ -31,12 +31,12 @@ run = '''
 desc = "Go to the root of current Git repo"
 
 [[manager.prepend_keymap]]
-on   = "T"
+on   = "e"
 run  = "plugin hide-preview"
 desc = "Hide or show preview"
 
 [[manager.prepend_keymap]]
-on   = "<c-t>"
+on   = "E"
 run  = "plugin max-preview"
 desc = "Maximize or restore preview"
 

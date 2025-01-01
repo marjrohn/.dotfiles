@@ -7,7 +7,7 @@ local spec = {
 local icons = require('local.icons')
 
 local section_b_cond = vim
-  .iter({ 95, 125 })
+  .iter({ 95, 115 })
   :map(function(nr)
     return function()
       return vim.o.columns >= nr
@@ -48,7 +48,7 @@ spec.opts.sections.lualine_c = {
   {
     'datetime',
     icon = icons.clock,
-    style = '%H:%M',
+    style = '%H:%M ',
     separator = { left = '', right = '' },
     padding = 0,
     color = function()
@@ -91,7 +91,7 @@ function spec.config(_, opts)
 
   opts = vim.tbl_deep_extend('force', opts, {
     options = {
-      theme = require('local.theme').gen_lualine_theme(),
+      theme = require('local.theme').gen_lualine_theme('auto'),
     },
   })
 

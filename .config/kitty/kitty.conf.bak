@@ -1,3 +1,10 @@
+include current-theme.conf
+# font_family      FantasqueSansM Nerd Font Mono
+font_size        12
+# bold_font        auto
+# italic_font      auto
+# bold_italic_font auto
+
 background_opacity 0.92
 draw_minimal_borders yes
 window_padding_width 16
@@ -32,13 +39,12 @@ map alt+shift+down move_window down
 
 map ctrl+shift+enter launch --cwd=current
 
-font_size 14
 
 # BEGIN_KITTY_FONTS
-font_family      family='VictorMono Nerd Font Mono' style=Medium features=+ss01
-bold_font        family='VictorMono Nerd Font Mono' style=Bold features=+ss01
-italic_font      family='VictorMono Nerd Font Mono' style='Medium Italic' features=+ss01
-bold_italic_font family='VictorMono Nerd Font Mono' style='Bold Italic' features=+ss01
+font_family      family='BlexMono Nerd Font Mono' style=Text features='+ss01 +ss02 +ss03 +ss04 +ss05 +ss06 +ss07 +zero'
+bold_font        family='BlexMono Nerd Font Mono' style=Bold features='+ss01 +ss02 +ss03 +ss04 +ss05 +ss06 +ss07 +zero'
+italic_font      family='BlexMono Nerd Font Mono' style='Text Italic' features='+ss01 +ss02 +ss03 +ss04 +ss05 +ss06 +ss07 +zero'
+bold_italic_font family='BlexMono Nerd Font Mono' style='Bold Italic' features='+ss01 +ss02 +ss03 +ss04 +ss05 +ss06 +ss07 +zero'
 # END_KITTY_FONTS
 
 

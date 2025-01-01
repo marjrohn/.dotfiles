@@ -7,20 +7,20 @@ spec.opts.ft_ignore = { 'help', 'lazy', 'TelescopePrompt', 'undotree' }
 spec.opts.bt_ignore = { 'terminal' }
 
 function spec.config(_, opts)
-  local builtin = require('statuscol.builtin')
   local ffi = require('statuscol.ffidef')
 
   local hl_range
 
   local function gen_relline_hls()
-    local v = 1 - vim.g.scrolloff
-    hl_range = math.ceil(vim.api.nvim_win_get_height(0) * v)
+    -- local v = 1 - vim.g.scrolloff
+    -- hl_range = math.ceil(vim.api.nvim_win_get_height(0) * v)
+    hl_range = vim.api.nvim_win_get_height(0)
 
     local color1 = vim.api.nvim_get_hl(0, { name = 'CursorLineNr' }).fg
     local color2 = vim.api.nvim_get_hl(0, { name = 'LineNr' }).fg
 
     for i = 1, hl_range do
-      local alpha = math.sqrt(i / (hl_range + 1))
+      local alpha = i / (hl_range + 1)
 
       vim.api.nvim_set_hl(0, 'RelLineNr' .. i, {
         fg = require('local.theme').mix_colors(color1, color2, alpha),
@@ -70,11 +70,9 @@ function spec.config(_, opts)
 
         if ufo_available then
           fold_ = fold_.get(event.buf)
-          local folds = vim
-            .iter(fold_ and fold_.foldRanges or {})
-            :map(function(fold)
-              return { start = fold.startLine + 1, end_ = fold.endLine + 1 }
-            end)
+          local folds = vim.iter(fold_ and fold_.foldRanges or {}):map(function(fold)
+            return { start = fold.startLine + 1, end_ = fold.endLine + 1 }
+          end)
 
           folds = folds:filter(function(fold)
             return fold.start <= line and line <= fold.end_
@@ -195,7 +193,7 @@ function spec.config(_, opts)
           foldclosed
           or (args.lnum >= cursor_fold.start and args.lnum <= cursor_fold.end_)
         then
-          hl = '%#Normal#'
+          hl = '%#FoldColumn#'
         else
           hl = get_hl(args)
         end

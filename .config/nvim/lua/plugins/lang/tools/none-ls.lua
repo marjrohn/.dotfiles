@@ -8,6 +8,8 @@ local spec = {
     'root_markers',
     'sources',
   },
+  -- Todo: define typying
+  opts = {},
 }
 
 spec.opts = {
@@ -16,20 +18,25 @@ spec.opts = {
 }
 
 function spec.config(_, opts)
-  opts.root_dir = opts.root_dir
-    or require('null-ls.utils').root_pattern(opts.root_markers)
+  local null_ls = require('null-ls')
 
+  opts.root_dir = opts.root_dir or require('null-ls.utils').root_pattern(opts.root_markers)
   opts.root_markers = nil
 
+  local sourcers = vim.deepcopy(opts.sources)
   opts.sources = vim
-    .iter(opts.sources)
+    .iter(vim.deepcopy(sourcers))
     :map(function(source)
-      return source()
+      return source(
+        null_ls.builtins.formatting,
+        null_ls.builtins.diagnostics,
+        null_ls.builtins.code_actions
+      )
     end)
     :flatten()
     :totable()
 
-  require('null-ls').setup(opts)
+  null_ls.setup(opts)
 end
 
 return spec

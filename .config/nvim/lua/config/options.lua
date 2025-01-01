@@ -3,18 +3,16 @@
 local g = vim.g
 local opt = vim.opt
 
--- set leader to space key
-g.mapleader = ' '
-g.localmapleader = ' '
-
-g.colorscheme = 'kanagawa'
-
 -- will make `scrolloff` and `sidescrolloff` relative
 -- to window current width/height
 g.sidescrolloff = 0.2 -- 20%
 g.scrolloff = 0.2
 
--- silent providers warning when running `:checkhealth`
+-- max size of a floating window (relative)
+g.win_width = 0.8 -- 80%
+g.win_height = 0.8
+
+-- silent providers warnings when running `:checkhealth`
 g.loaded_python3_provider = 0
 g.loaded_ruby_provider = 0
 g.loaded_perl_provider = 0
