@@ -49,8 +49,8 @@ local textobjects = treesitter.opts.textobjects
 
 textobjects.swap = {
   enable = true,
-  swap_next = { ['<c-s-l>'] = '@parameter.inner' },
-  swap_previous = { ['<c-s-h>'] = '@parameter.inner' },
+  swap_next = { ['<a-l>'] = '@parameter.inner' },
+  swap_previous = { ['<a-h>'] = '@parameter.inner' },
 }
 
 textobjects.move = {

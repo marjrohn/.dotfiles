@@ -70,11 +70,9 @@ function spec.config(_, opts)
 
         if ufo_available then
           fold_ = fold_.get(event.buf)
-          local folds = vim
-            .iter(fold_ and fold_.foldRanges or {})
-            :map(function(fold)
-              return { start = fold.startLine + 1, end_ = fold.endLine + 1 }
-            end)
+          local folds = vim.iter(fold_ and fold_.foldRanges or {}):map(function(fold)
+            return { start = fold.startLine + 1, end_ = fold.endLine + 1 }
+          end)
 
           folds = folds:filter(function(fold)
             return fold.start <= line and line <= fold.end_

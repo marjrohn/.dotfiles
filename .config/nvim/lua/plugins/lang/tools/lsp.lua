@@ -1,66 +1,89 @@
----@class LspConfig
----@field buf LspConfig.buf?
----@field capabilities lsp.ClientCapabilities?
----@field diagnostic vim.diagnostic.Opts?
----@field handlers table<string, function>?
----@field servers table<string, LspConfig.servers>?
-
----@class LspConfig.buf
----@field code_action LspConfig.buf.code_action?
----@field declaration vim.lsp.LocationOpts?
----@field definition vim.lsp.LocationOpts?
----@field document_symbol vim.lsp.ListOpts?
----@field format LspConfig.buf.format?
----@field implementation vim.lsp.LocationOpts?
----@field references vim.lsp.ListOpts?
----@field rename LspConfig.buf.rename?
----@field type_definition vim.lsp.LocationOpts?
----@field workspace_symbol vim.lsp.ListOpts?
-
----@class LspConfig.buf.code_action: vim.lsp.buf.code_action.Opts
----@field filter fun(x: lsp.CodeAction|lsp.Command):boolean?[]?
-
----@class LspConfig.buf.format: vim.lsp.buf.format.Opts
----@field filter fun(client: vim.lsp.Client):boolean?[]?
-
----@class LspConfig.buf.rename: vim.lsp.buf.rename.Opts
----@field filter fun(client: vim.lsp.Client): boolean?[]?
-
----@class LspConfig.servers: vim.lsp.ClientConfig
----@field cmd (string[]|fun(dispatchers: vim.lsp.rpc.Dispatchers): vim.lsp.rpc.PublicClient)?
-
 local spec = {
   'neovim/nvim-lspconfig',
   dependencies = {
     'saghen/blink.cmp',
-    { 'j-hui/fidget.nvim', opts = {} },
+    { 'j-hui/fidget.nvim', opts = { progress = { ignore = { 'null-ls' } } } },
   },
   opts_extend = {
     'buf.code_action.filter',
     'buf.format.filter',
     'buf.rename.filter',
   },
-  ---@type LspConfig
-  opts = {},
 }
+---@class LspConfig
+spec.opts = {}
 
--- options for some `lsp.buf.*` functions
--- `filter` option can receive a list of predicate
--- that will be reduced using `and` operation
+-- Options for the following `vim.lsp.buf` functions:
+-- - [vim.lsp.buf.code_action](lua://LspConfig.buf.code_action)
+-- - [vim.lsp.buf.declaration](lua://LspConfig.buf.declaration)
+-- - [vim.lsp.buf.definition](lua://LspConfig.buf.definition)
+-- - [vim.lsp.buf.document_symbol](lua://LspConfig.buf.document_symbol)
+-- - [vim.lsp.buf.implementation](lua://LspConfig.buf.implementation)
+-- - [vim.lsp.buf.format](lua://LspConfig.buf.format)
+-- - [vim.lsp.buf.rename](lua://LspConfig.buf.rename)
+-- - [vim.lsp.buf.references](lua://LspConfig.buf.references)
+-- - [vim.lsp.buf.type_definition](lua://LspConfig.buf.type_definition)
+-- - [vim.lsp.buf.workspace_symbol](lua://LspConfig.buf.workspace_symbol)
+-- `filter` list are reduced to a single predicate using `and` operator.
+---@class LspConfig.buf
 spec.opts.buf = {
-  code_action = { filter = {}, apply = true },
+  -- Options for `vim.lsp.buf.code_action`.
+  ---@class LspConfig.byf.code_action: vim.lsp.buf.code_action.Opts?
+  code_action = {
+    ---@type (fun(x: lsp.CodeAction|lsp.Command):boolean)[]?
+    filter = {},
+    apply = true,
+  },
+  -- Options for `vim.lsp.buf.declaration`.
+  ---@type vim.lsp.LocationOpts?
   declaration = {},
+  -- Options for `vim.lsp.buf.definition`.
+  ---@type vim.lsp.LocationOpts?
   definition = {},
+  -- Options for `vim.lsp.buf.document_symbol`.
+  ---@type vim.lsp.ListOpts?
   document_symbol = {},
+  -- Options for `vim.lsp.buf.implematation`.
+  ---@type vim.lsp.LocationOpts?
   implementation = {},
-  format = { filter = {}, async = true },
-  rename = { filter = {} },
+  -- Options for `vim.lsp.buf.format`.
+  ---@class LspConfig.buf.format: vim.lsp.buf.format.Opts?
+  format = {
+    ---@type (fun(client: vim.lsp.Client):boolean)[]?
+    filter = {},
+    async = true,
+  },
+  -- Options for `vim.lsp.buf.references`.
+  ---@type vim.lsp.ListOpts?
   references = {},
+  -- Options for `vim.lsp.buf.rename`
+  ---@class LspConfig.buf.rename: vim.lsp.buf.rename.Opts?
+  rename = {
+    ---@type (fun(client: vim.lsp.Client): boolean)[]?
+    filter = {},
+  },
+  -- Options for `vim.lsp.buf.type_definition`.
+  ---@type vim.lsp.LocationOpts?
   type_definition = {},
+  -- Options for `vim.lsp.buf.workspace_symbol`.
+  ---@type vim.lsp.ListOpts?
   workspace_symbol = {},
 }
 
--- global capabilities options
+-- Global capabilities options that will be pass to each server,
+-- capabilities defined in the server can override any option defined here.
+-- Exemple:
+-- ```lua
+--   servers = {
+--     lua_ls = {
+--       capabilities = {
+--          -- this will be overridden
+--          foldingRange = { lineFoldingOnly = False }
+--       }
+--     }
+--   }
+-- ```
+---@class LspConfig.capabilities: lsp.ClientCapabilities?
 spec.opts.capabilities = {
   workspace = {
     fileOperations = { didRename = true, willRename = true },
@@ -70,7 +93,8 @@ spec.opts.capabilities = {
   },
 }
 
--- options for `vim.diagnostic.config()`
+-- Options for `vim.diagnostic.config()`.
+---@class LspConfig.diagnostic: vim.diagnostic.Opts?
 spec.opts.diagnostic = {
   severity_sort = true,
   -- stylua: ignore
@@ -93,24 +117,43 @@ spec.opts.diagnostic = {
   virtual_text = true,
 }
 
--- global handlers options
+-- Global handlers options that will be pass to each server.
+-- Any option defined here can be override by the specific server configuration,
+-- as describe in [LspConfig.capabilities](lua://LspConfig.capabilities)
+---@alias LspConfig.handlers table<string, function>
+---@type LspConfig.handlers?
 spec.opts.handlers = {
-  ['textDocument/hover'] = vim.lsp.with(
-    vim.lsp.handlers.hover,
-    { border = 'rounded' }
-  ),
+  ['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'rounded' }),
   ['textDocument/signatureHelp'] = vim.lsp.with(
     vim.lsp.handlers.signature_help,
     { border = 'rounded' }
   ),
 }
 
--- server configuration
-spec.opts.servers = {
-  -- moved to lua/plugins/lang/lua.lua
-  -- lua_ls = {},
-}
+-- Server configuration. Any key defined here will be pass to `nvim-lspconfig`
+-- setup function. To see a list of all availabre LSP run `:h lspconfig-all`.
+-- Exemple:
+-- ```lua
+--   servers = {
+--     -- lua
+--     lua_ls = {
+--       capabilities = { ... },
+--       settings = { ... },
+--       on_attach = function(client) ... end,
+--       ...
+--     },
+--     -- python
+--     basedpyright = { ... },
+--     -- rust
+--     rust_analyzer = { ... },
+--     ...
+--   }
+-- ```
+---@alias LspConfig.servers table<string, lspconfig.Config>
+---@type LspConfig.servers?
+spec.opts.servers = {}
 
+---@param opts LspConfig
 function spec.config(_, opts)
   local helpers = require('local.helpers')
   local autocmd = helpers.autocmd
@@ -132,8 +175,9 @@ function spec.config(_, opts)
       return
     end
 
-    -- set current directory for current tab
-    if client.root_dir then
+    -- set the server rootdir as cwd for current tab
+    -- if the root is the homedir then dont set
+    if not vim.fn.expand('~/'):match(client.root_dir or '') then
       vim.cmd.tcd(client.root_dir)
     end
 
@@ -143,11 +187,7 @@ function spec.config(_, opts)
 
     -- the following two autocommands are used to highlight references of the
     -- word under your cursor when your cursor rests there for a little while.
-    if
-      client.supports_method(
-        vim.lsp.protocol.Methods.textDocument_documentHighlight
-      )
-    then
+    if client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
       local highlight_augroup = augroup('lsp_highlight', false)
 
       autocmd({ 'CursorHold', 'CursorHoldI' }, {
@@ -174,16 +214,16 @@ function spec.config(_, opts)
       })
     end
 
-    -- keymaps
+    --- keymaps
     map({ 'n', 'x' }, { '<f3>', 'gra', '<leader>la' }, function()
       vim.lsp.buf.code_action(opts.buf.code_action)
     end, { desc = 'Code Action' })
 
-    nmap('gd', function()
+    nmap('gD', function()
       vim.lsp.buf.declaration(opts.buf.declaration)
     end, { desc = 'Goto Declaration' })
 
-    nmap('gD', function()
+    nmap('gd', function()
       vim.lsp.buf.definition(opts.buf.definition)
     end, { desc = 'Goto Definition' })
 
@@ -209,7 +249,9 @@ function spec.config(_, opts)
       vim.lsp.buf.references(opts.buf.references)
     end, { desc = 'Goto References' })
 
-    imap('<c-s>', vim.lsp.buf.signature_help, { desc = 'Signature Help' })
+    -- Todo: remove <c-s> in v0.11, since will be the default
+    imap({ '<f1>', '<c-s>' }, vim.lsp.buf.signature_help, { desc = 'Signature Help' })
+    nmap('<f1>', vim.lsp.buf.signature_help, { desc = 'Signature Help' })
 
     nmap('go', function()
       vim.lsp.buf.type_definition(opts.buf.type_definition)
@@ -218,17 +260,20 @@ function spec.config(_, opts)
     nmap('grw', function()
       vim.lsp.buf.workspace_symbol(nil, opts.buf.workspace_symbol)
     end)
+    ---
 
-    -- toggle codelens
-    if
-      client.supports_method(vim.lsp.protocol.Methods.textDocument_codeLens)
-    then
-      local codelens_augroup = augroup('lsp_codelens', false)
-      local is_enabled = false
+    local state = {
+      inlay_hint = true,
+      codelens = false,
+    }
 
-      local function enable()
+    -- Toggle codelens
+    if client.supports_method(vim.lsp.protocol.Methods.textDocument_codeLens) then
+      local codelens_augroup = augroup('lsp_attach_codelens', false)
+
+      local function codelens_enable()
+        state.codelens = true
         vim.lsp.codelens.refresh()
-        is_enabled = true
 
         autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
           group = codelens_augroup,
@@ -237,9 +282,9 @@ function spec.config(_, opts)
         })
       end
 
-      local function disable()
+      local function codelens_disable()
+        state.codelens = false
         vim.lsp.codelens.clear()
-        is_enabled = false
 
         vim.api.nvim_clear_autocmds({
           group = codelens_augroup,
@@ -247,29 +292,49 @@ function spec.config(_, opts)
         })
       end
 
-      -- uncomment this to enable on attach
-      -- enable()
-
-      nmap('<leader>tc', function()
-        if is_enabled then
-          disable()
+      nmap('<leader>tl', function()
+        if state.codelens then
+          codelens_disable()
         else
-          enable()
+          codelens_enable()
         end
       end, { desc = 'Toggle Codelens' })
     end
 
-    -- toogle inlay hints
-    if
-      client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint)
-    then
-      -- remove this to not enable on attack
-      vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+    -- Toggle inlay hints
+    if client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+      local inlayhint_augroup = augroup('lsp_attach_inlayhint', false)
+
+      local function inlayhint_enable()
+        state.codelens = true
+        vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+
+        autocmd({ 'InsertEnter', 'InsertLeave' }, {
+          group = inlayhint_augroup,
+          buffer = event.buf,
+          callback = function()
+            local filter = { bufnr = event.buf }
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(filter), filter)
+          end,
+        })
+      end
+
+      local function inlayhint_disable()
+        state.codelens = false
+        vim.lsp.inlay_hint.enable(false, { bufnr = event.buf })
+
+        vim.api.nvim_clear_autocmds({
+          group = inlayhint_augroup,
+          buffer = event.buf,
+        })
+      end
 
       nmap('<leader>th', function()
-        vim.lsp.inlay_hint.enable(
-          not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf })
-        )
+        if state.inlay_hint then
+          inlayhint_disable()
+        else
+          inlayhint_enable()
+        end
       end, { desc = 'Toggle Inlay Hints' })
     end
   end
@@ -282,9 +347,7 @@ function spec.config(_, opts)
     config.capabilities = require('blink.cmp').get_lsp_capabilities(
       vim.tbl_deep_extend('force', opts.capabilities, config.capabilities or {})
     )
-
-    config.handlers =
-      vim.tbl_deep_extend('force', opts.handlers, config.handlers or {})
+    config.handlers = vim.tbl_deep_extend('force', opts.handlers, config.handlers or {})
 
     require('lspconfig')[server].setup(config)
   end

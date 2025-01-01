@@ -10,6 +10,8 @@ local spec = {
     'rafamadriz/friendly-snippets',
     { 'saghen/blink.compat', opts = { impersonate_nvim_cmp = true } },
   },
+  ---@module 'blink.cmp'
+  ---@type blink.cmp.Config
   opts = {},
 }
 
