@@ -1,0 +1,20 @@
+---
+base: lua51
+
+globals:
+  ya:
+    any: true
+  ui:
+    any: true
+  th:
+    any: true
+  cx:
+    any: true
+  Tab:
+    any: true
+  Header:
+    any: true
+  Linemode:
+    any: true
+  Status:
+    any: true

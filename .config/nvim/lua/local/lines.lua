@@ -66,11 +66,9 @@ local function visual_helper(register, type)
   local last = vim.api.nvim_buf_get_mark(0, '>')
   local lines = vim.fn.getregion(first, last, { type = mode })
 
-  if
-    vim.iter(lines):all(function(line)
-      return line:match(pattern) and true or false
-    end)
-  then
+  if vim.iter(lines):all(function(line)
+    return line:match(pattern) and true or false
+  end) then
     register = '_'
   end
 

@@ -10,6 +10,7 @@ fi
 # env
 export PATH=$HOME/.local/bin:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
+export PATH=$HOME/.neovim/bin:$PATH
 
 export EDITOR=$(which nvim)
 export VISUAL=$(which nvim)
@@ -54,7 +55,7 @@ bindkey '^n' history-search-forward
 bindkey '^[w' kill-region
 
 # History
-HISTSIZE=5000
+HISTSIZE=10000
 SAVEHIST=$HISTSIZE
 HISTFILE=~/.zsh_history
 HISTDUP=erase
@@ -77,7 +78,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --icons --sort type $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza --icons --sort type $realpath'
 
 # Aliases
-alias c=clear
+alias c="clear"
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."

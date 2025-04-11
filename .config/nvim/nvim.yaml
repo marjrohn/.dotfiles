@@ -1,0 +1,25 @@
+---
+base: lua51
+
+globals:
+  vim:
+    any: true
+  assert:
+    args:
+      - type: bool
+      - type: string
+        required: false
+  MiniAi:
+    any: true
+  MiniAlign:
+    any: true
+  MiniIcons:
+    any: true
+  MiniNotify:
+    any: true
+  MiniOperators:
+    any: true
+  MiniSplitJoin:
+    any: true
+  MiniSurround:
+    any: true

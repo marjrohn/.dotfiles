@@ -1,9 +1,5 @@
 -- [[ General Keymaps ]]
 
--- set leader to space key
-vim.g.mapleader = ' '
-vim.g.localmapleader = ' '
-
 local buffer = require('local.buffer')
 local lines = require('local.lines')
 local helpers = require('local.helpers')
@@ -14,11 +10,17 @@ local imap = helpers.mapping({ mode = 'i' })
 local xmap = helpers.mapping({ mode = 'x' })
 
 -- Disabled mappings
-map({ 'n', 'x' }, { '<leader>', 'q:', 'q/' }, '<nop>', { desc = 'Disabled' })
+map({ 'n', 'x' }, { '<leader>', 's', 'q:', 'q/', 'q?' }, '<nop>', { desc = 'Disabled' })
 
--- Better up/down
-map({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true })
-map({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true })
+-- save to jump list when using j/k with count
+map({ 'n', 'x' }, 'j', function()
+  return vim.v.count1 > 1 and "m'" .. vim.v.count1 .. 'j' or 'gj'
+end, { expr = true })
+map({ 'n', 'x' }, 'k', function()
+  return vim.v.count1 > 1 and "m'" .. vim.v.count1 .. 'k' or 'gk'
+end, { expr = true })
+-- map({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true })
+-- map({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true })
 
 -- Center cursor line when scrolling
 nmap('<c-f>', '<c-f>zz')
@@ -36,7 +38,6 @@ map({ 'n', 'x' }, '<s-down>', '<c-f>zz', { desc = 'Scroll window down' })
 map({ 'n', 'x' }, '<s-up>', '<c-b>zz', { desc = 'Scroll window up' })
 map({ 'n', 'x' }, '<s-left>', 'zH', { desc = 'Scroll to far left' })
 map({ 'n', 'x' }, '<s-right>', 'zL', { desc = 'Scroll to far right' })
----
 
 -- Resize window with ctrl + arrow keys
 nmap('<c-left>', '<c-w>>', { desc = 'Decrease Window Width' })
@@ -55,11 +56,7 @@ nmap('<a-j>', "<cmd>execute 'move .+' . v:count1<cr>==", { desc = 'Move Line Dow
 nmap('<a-k>', "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==", { desc = 'Move Line Up' })
 imap('<a-j>', '<esc><cmd>m .+1<cr>==gi', { desc = 'Move Line Down' })
 imap('<a-k>', '<esc><cmd>m .-2<cr>==gi', { desc = 'Move Line Up' })
-xmap(
-  '<a-j>',
-  ":<c-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv",
-  { desc = 'Move Line Down' }
-)
+xmap('<a-j>', ":<c-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = 'Move Line Down' })
 xmap(
   '<a-k>',
   ":<c-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv",
@@ -67,35 +64,16 @@ xmap(
 )
 
 -- Clear search highlight with <esc>
-map(
-  { 'n', 'i' },
-  '<esc>',
-  '<cmd>nohl<cr><esc>',
-  { desc = 'Escape and Clear Hightlight Search' }
-)
+map({ 'n', 'i' }, '<esc>', '<cmd>nohl<cr><esc>', { desc = 'Escape and Clear Hightlight Search' })
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
 nmap('n', "'Nn'[v:searchforward].'zzzv'", { desc = 'Next Search Result', expr = true })
 nmap('N', "'nN'[v:searchforward].'zzzv'", { desc = 'Prev Search Result', expr = true })
-map(
-  { 'x', 'o' },
-  'n',
-  "'Nn'[v:searchforward]",
-  { desc = 'Next Search Result', expr = true }
-)
-map(
-  { 'x', 'o' },
-  'N',
-  "'nN'[v:searchforward]",
-  { desc = 'Prev Search Result', expr = true }
-)
+map({ 'x', 'o' }, 'n', "'Nn'[v:searchforward]", { desc = 'Next Search Result', expr = true })
+map({ 'x', 'o' }, 'N', "'nN'[v:searchforward]", { desc = 'Prev Search Result', expr = true })
 
 -- Undo break-points
--- stylua: ignore
-for _, point in ipairs({
-  ',', '.', ';', ':', '/', '\\',
-  '(', ')', '[', ']', '{', '}'
-}) do
+for _, point in ipairs({ ',', '.', ';', ':', '/' }) do
   imap(point, point .. '<c-g>u')
 end
 
@@ -174,13 +152,8 @@ nmap('gcO', lines.comment_above, { desc = 'Add Comment Above' })
 nmap('gco', lines.comment_below, { desc = 'Add Comment Below' })
 nmap({ 'gca', 'gcA' }, lines.comment_at_end, { desc = 'Add Comment at End' })
 
--- Add a new line above/below the cursor
--- NOTE: this will become default in v0.11, assuming leader = space
-nmap('[<leader>', lines.add_lines_above, { desc = 'Add New Line Above' })
-nmap(']<leader>', lines.add_lines_below, { desc = 'Add New Line Below' })
-
 -- Delete contents of the current line
-nmap('d<leader>', '<cmd>call setline(".", "")<cr>', { desc = 'Clear Current Line' })
+nmap('d<space>', '<cmd>call setline(".", "")<cr>', { desc = 'Clear Current Line' })
 
 -- Quitting
 nmap('<leader>q', '<cmd>confirm q<cr>', { desc = 'Quit' })
@@ -197,22 +170,10 @@ nmap('<leader>bn', '<cmd>enew<cr>', { desc = 'New Buffer' })
 nmap('<leader>bv', '<cmd>vnew<cr>', { desc = 'New Buffer in a Vertical Split' })
 nmap('<leader>bh', '<cmd>new<cr>', { desc = 'New Buffer in a Horizontal Split' })
 
-nmap(
-  { '<leader>bb', "<leader>'" },
-  '<cmd>edit #<cr>',
-  { desc = 'Go to Last Accessed Buffer' }
-)
+nmap({ '<leader>bb', "<leader>'" }, '<cmd>edit #<cr>', { desc = 'Go to Last Accessed Buffer' })
 
-nmap(
-  { '<leader>b[', 'H' },
-  "<cmd>execute 'bprev' . v:count1<cr>",
-  { desc = 'Previous Buffer' }
-)
-nmap(
-  { '<leader>b]', 'L' },
-  "<cmd>execute 'bnext' . v:count1<cr>",
-  { desc = 'Next Buffer' }
-)
+nmap({ '<leader>b[', 'H' }, "<cmd>execute 'bprev' . v:count1<cr>", { desc = 'Previous Buffer' })
+nmap({ '<leader>b]', 'L' }, "<cmd>execute 'bnext' . v:count1<cr>", { desc = 'Next Buffer' })
 
 nmap('<leader>bD', '<cmd>bdelete', { desc = 'Delete Buffer and Window' })
 nmap('<leader>bd', buffer.buf_remove, { desc = 'Delete Buffer' })
@@ -220,6 +181,69 @@ nmap('<leader>bo', buffer.buf_only, { desc = 'Buffer Only' })
 ---
 
 --- Tabs
+local function tab_do(args)
+  local tabs = vim.api.nvim_list_tabpages()
+  local cmd = args[1]
+  local first = args.first
+  local last = args.last
+
+  if args.index then
+    local to = math.min(math.max(args.index, 1), #tabs)
+
+    if to == 1 then
+      return string.format('<cmd>silent! %s<cr>', first)
+    end
+
+    if to == #tabs then
+      return string.format('<cmd>silent! %s<cr>', last)
+    end
+
+    return string.format('<cmd>silent! %s %d<cr>', cmd, to)
+  end
+
+  local currtab = vim.api.nvim_get_current_tabpage()
+  local tabnr = vim.api.nvim_tabpage_get_number(currtab)
+  local dir = args.dir
+
+  if dir == 1 and tabnr == #tabs then
+    return string.format('<cmd>silent! %s<cr>', first)
+  end
+
+  if dir == -1 and tabnr == 1 then
+    return string.format('<cmd>silent! %s<cr>', last)
+  end
+
+  local dir_sym = dir == 1 and '+' or '-'
+
+  local max_count = dir == 1 and (#tabs - tabnr) or (tabnr - 1)
+
+  return string.format('<cmd>silent! %s %s%d<cr>', cmd, dir_sym, math.min(vim.v.count1, max_count))
+end
+
+local function tabnav(args)
+  return function()
+    return tab_do({
+      'tabnext',
+      dir = args.dir,
+      index = args.index,
+      first = 'tabfist',
+      last = 'tablast',
+    })
+  end
+end
+
+local function tabmov(args)
+  return function()
+    return tab_do({
+      'tabmove',
+      dir = args.dir,
+      index = args.index,
+      first = '0tabmove',
+      last = '$tabmove',
+    })
+  end
+end
+
 nmap('<leader><tab>n', '<cmd>tabnew<cr>', { desc = 'New Tab' })
 
 nmap({ '<leader><tab>0', '<leader>1' }, '<cmd>tabfirst<cr>', { desc = 'Go to First Tab' })
@@ -231,16 +255,8 @@ nmap(
   { desc = 'Go to Last Accessed Tab' }
 )
 
-nmap(
-  { '<leader><tab>h', '<c-h>' },
-  "<cmd>silent! execute 'tabprev +' . v:count1<cr>",
-  { desc = 'Previous Tab' }
-)
-nmap(
-  { '<leader><tab>l', '<c-l>' },
-  "<cmd>silent! execute 'tabnext +' . v:count1<cr>",
-  { desc = 'Next Tab' }
-)
+nmap({ '<leader><tab>h', '<c-h>' }, tabnav({ dir = -1 }), { desc = 'Previous Tab', expr = true })
+nmap({ '<leader><tab>l', '<c-l>' }, tabnav({ dir = 1 }), { desc = 'Next Tab', expr = true })
 
 nmap(
   { '<leader>!', '<leader><s-tab>0', '<leader><s-tab>)' },
@@ -252,46 +268,40 @@ nmap(
   '<cmd>$tabmove<cr>',
   { desc = 'Move Tab to the Last' }
 )
-
 nmap({
   '<leader>"',
   '<leader><tab><s-tab>',
   '<leader><s-tab><tab>',
   '<leader><s-tab><s-tab>',
-}, '<cmd>silent! tabmove #', { desc = 'Move To Last Accessed Tab' })
+}, '<cmd>silent! tabmove #<cr>', { desc = 'Move To Last Accessed Tab' })
 
-nmap({ '<leader><tab>j', '<c-j>' }, function()
-  local tabnr = vim.api.nvim_tabpage_get_number(0)
-  local tab_list = vim.api.nvim_list_tabpages()
-  local count = #tab_list - (tabnr + vim.v.count1 - 1) % #tab_list
-
-  return '<cmd>silent! tabmove -' .. count .. '<cr>'
-end, { desc = 'Move Tab to the Left', expr = true })
-
-nmap({ '<leader><tab>k', '<c-k>' }, function()
-  local tabnr = vim.api.nvim_tabpage_get_number(0)
-  local tab_list = vim.api.nvim_list_tabpages()
-  local count = 1 + (tabnr + vim.v.count1 - 1) % #tab_list
-
-  return '<cmd>silent! tabmove +' .. count .. '<cr>'
-end, { desc = 'Move Tab to the Right', expr = true })
+nmap(
+  { '<leader><tab>j', '<c-j>' },
+  tabmov({ dir = -1 }),
+  { desc = 'Move Tab to the Left', expr = true }
+)
+nmap(
+  { '<leader><tab>k', '<c-k>' },
+  tabmov({ dir = 1 }),
+  { desc = 'Move Tab to the Right', expr = true }
+)
 
 nmap('<leader><tab>o', '<cmd>tabonly<cr>', { desc = 'Tab Only' })
 nmap('<leader><tab>d', '<cmd>tabclose<cr>', { desc = 'Close Tab' })
 
 for idx = 2, 9 do
-  nmap('<leader>' .. idx, function()
-    local num_tabs = #vim.api.nvim_list_tabpages()
-    return '<cmd>silent! tabnext ' .. math.min(idx, num_tabs) .. '<cr>'
-  end, { desc = 'Go to Tab ' .. idx, expr = true })
-
-  nmap('<leader><s-' .. idx .. '>', function()
-    local num_tabs = #vim.api.nvim_list_tabpages()
-    return '<cmd>silent! tabmove ' .. math.min(idx, num_tabs) .. '<cr>'
-  end, { desc = 'Go to Tab ' .. idx, expr = true })
+  nmap(
+    string.format('<leader>%d', idx),
+    tabnav({ index = idx }),
+    { desc = 'Go to Tab ' .. idx, expr = true }
+  )
+  nmap(
+    string.format('<leader><s-%d>', idx),
+    tabmov({ index = idx }),
+    { desc = 'Move to Tab ' .. idx, expr = true }
+  )
 end
 
--- toggle tabline
 nmap('<leader><tab>t', function()
   if vim.o.tabline == 1 then
     if vim.fn.tabpagenr('$') > 1 then

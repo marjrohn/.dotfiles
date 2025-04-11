@@ -21,9 +21,7 @@ if vim.env.TERM == 'xterm-kitty' then
   autocmd({ 'VimLeave', 'VimSuspend' }, {
     group = augroup('kitty_padding_enable'),
     callback = function()
-      vim.cmd(
-        'silent !' .. kitty_cmd .. ' @ --to=$KITTY_LISTEN_ON set-spacing padding=default'
-      )
+      vim.cmd('silent !' .. kitty_cmd .. ' @ --to=$KITTY_LISTEN_ON set-spacing padding=default')
     end,
   })
 end
@@ -43,6 +41,16 @@ autocmd('TextYankPost', {
   group = augroup('highlight_yank'),
   callback = function()
     vim.highlight.on_yank()
+  end,
+})
+
+-- remove background of some highlights
+autocmd('ColorScheme', {
+  group = augroup('highlight_no_bg'),
+  callback = function()
+    for _, kind in ipairs({ 'Error', 'Warn', 'Info', 'Hint' }) do
+      vim.cmd.highlight('DiagnosticVirtualText' .. kind .. " guibg='NONE'")
+    end
   end,
 })
 
@@ -116,7 +124,7 @@ autocmd('FileType', {
 -- wrap and check for spell in text filetypes
 autocmd('FileType', {
   group = augroup('wrap_spell'),
-  pattern = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown' },
+  pattern = { 'text', 'plaintex', 'typst', 'gitcommit' },
   callback = function()
     vim.opt_local.wrap = true
     vim.opt_local.spell = true
@@ -139,6 +147,7 @@ autocmd({ 'BufWritePre' }, {
     if event.match:match('^%w%w+:[\\/][\\/]') then
       return
     end
+    ---@diagnostic disable-next-line: undefined-field
     local file = vim.uv.fs_realpath(event.match) or event.match
     vim.fn.mkdir(vim.fn.fnamemodify(file, ':p:h'), 'p')
   end,
@@ -148,7 +157,7 @@ autocmd({ 'BufWritePre' }, {
 -- also do not insert comment leader on newlines
 autocmd('FileType', {
   group = augroup('no_auto_comment'),
-  command = "setlocal formatoptions-=cro"
+  command = 'setlocal formatoptions-=cro',
 })
 
 -- make 'scrolloff' and 'sidescrolloff' relative

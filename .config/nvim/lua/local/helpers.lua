@@ -5,9 +5,11 @@ function M.mapping(default_opts)
 
   local _mode = default_opts.mode
   local key_list = default_opts.key_list
+  local desc_prefix = default_opts.desc_prefix or ''
 
   default_opts.mode = nil
   default_opts.key_list = nil
+  default_opts.desc_prefix = nil
 
   if key_list and type(key_list) ~= 'table' then
     error("Invalid 'key_list': Expected a table, got " .. type(key_list))
@@ -28,6 +30,10 @@ function M.mapping(default_opts)
       opts.noremap = false
     elseif opts.noremap == nil then
       opts.noremap = true
+    end
+
+    if opts.desc then
+      opts.desc = desc_prefix .. opts.desc
     end
 
     vim.iter(lhs):each(function(_lhs)
@@ -52,7 +58,7 @@ function M.mapping(default_opts)
 end
 
 function M.augroup(name, clear)
-  if clear == nil then
+  if type(clear) ~= 'boolean' then
     clear = true
   end
 

@@ -1,0 +1,15 @@
+{
+  "runtime.version": "LuaJIT",
+  "diagnostics.globals": ["ui",
+        "Tab",
+        "ya",
+        "th",
+        "Status",
+        "Linemode",
+        "cx",
+        "Header"],
+    "diagnostics.disable": [
+        "discard-returns",
+        "cast-local-type"
+    ]
+}

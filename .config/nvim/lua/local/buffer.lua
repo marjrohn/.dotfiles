@@ -7,40 +7,55 @@ function M.buf_list()
   end, vim.api.nvim_list_bufs())
 end
 
-function M.buf_remove(buf)
+function M.buf_remove()
   local buflist = M.buf_list()
-
-  if buf == nil or buf == 0 then
-    buf = vim.api.nvim_get_current_buf()
-  elseif not vim.list_contains(buflist, buf) then
-    return
-  end
+  local buf = vim.api.nvim_get_current_buf()
+  local next_buf
 
   if #buflist == 1 then
     if vim.api.nvim_buf_get_name(buf) ~= '' then
-      vim.api.nvim_win_set_buf(0, vim.api.nvim_create_buf(true, false))
+      next_buf = vim.api.nvim_create_buf(true, false)
     else
       return
     end
   else
-    local number = vim
-      .iter(ipairs(buflist))
-      :map(function(n, _buf)
-        if _buf == buf then
-          return n
-        end
-      end)
-      :next()
+    -- stylua: ignore
+    local number = vim.iter(ipairs(buflist)):map(function(n, _buf)
+      if _buf == buf then
+        return n
+      end
+    end):next()
 
-    local next = math.max(number + 1, #buflist)
-    if number == next then
-      next = number - 1
-    end
-
-    vim.api.nvim_win_set_buf(0, buflist[next])
+    next_buf = buflist[1 + number % #buflist]
   end
 
-  vim.api.nvim_buf_delete(buf, {})
+  vim.api.nvim_win_set_buf(0, next_buf)
+  -- workaround to avoid error msg, using `pcall` for some reason is not enough
+  vim.v.errmsg = ''
+  vim.cmd(string.format('silent! call v:lua.vim.api.nvim_buf_delete(%d, {})', buf))
+
+  if vim.v.errmsg ~= '' and vim.api.nvim_buf_is_valid(buf) then
+    vim.api.nvim_win_set_buf(0, buf)
+
+    vim.ui.input({ prompt = 'Failed to delete buffer, force? (y/N): ' }, function(input)
+      input = vim.trim(input or ''):lower()
+
+      if vim.tbl_contains({ 'n', 'no', '' }, input) then
+        return
+      end
+
+      if vim.tbl_contains({ 'y', 'yes' }, input) then
+        vim.api.nvim_win_set_buf(0, next_buf)
+        pcall(vim.api.nvim_buf_delete, buf, { force = true })
+        return
+      end
+
+      vim.notify(
+        "Invalid input: expected 'y'|'yes' (force) or 'n'|'no' (don't force).",
+        vim.log.levels.WARN
+      )
+    end)
+  end
 end
 
 function M.buf_only()

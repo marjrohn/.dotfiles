@@ -1,6 +1,7 @@
---- Bootstrap lazy.nvim
+-- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 
+---@diagnostic disable-next-line: undefined-field
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
 
@@ -25,53 +26,36 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 
 vim.opt.rtp:prepend(lazypath)
----
 
---- keymaps
-local nmap = require('local.helpers').mapping({ mode = 'n' })
+-- keymaps
+local nmap = require('local.helpers').mapping({ mode = 'n', desc_prefix = 'Lazy: ' })
 
 -- stylua: ignore start
-nmap('<leader><cr><cr>', ':Lazy<cr>',         { desc = 'Lazy'    })
-nmap('<leader><cr>i',    ':Lazy install<cr>', { desc = 'Install' })
-nmap('<leader><cr>u',    ':Lazy update<cr>',  { desc = 'Update'  })
-nmap('<leader><cr>s',    ':Lazy sync<cr>',    { desc = 'Sync'    })
-nmap('<leader><cr>x',    ':Lazy clean<cr>',   { desc = 'Clean'   })
-nmap('<leader><cr>c',    ':Lazy check<cr>',   { desc = 'Check'   })
-nmap('<leader><cr>l',    ':Lazy log<cr>',     { desc = 'Log'     })
-nmap('<leader><cr>r',    ':Lazy restore<cr>', { desc = 'Restore' })
-nmap('<leader><cr>p',    ':Lazy profile<cr>', { desc = 'Profile' })
-nmap('<leader><cr>b',    ':Lazy debug<cr>',   { desc = 'Debug'   })
-nmap('<leader><cr>h',    ':Lazy help<cr>',    { desc = 'Help'    })
+nmap('<leader><cr><cr>', '<cmd>Lazy<cr>',         { desc = 'Plugins' })
+nmap('<leader><cr>i',    '<cmd>Lazy install<cr>', { desc = 'Install' })
+nmap('<leader><cr>u',    '<cmd>Lazy update<cr>',  { desc = 'Update'  })
+nmap('<leader><cr>s',    '<cmd>Lazy sync<cr>',    { desc = 'Sync'    })
+nmap('<leader><cr>x',    '<cmd>Lazy clean<cr>',   { desc = 'Clean'   })
+nmap('<leader><cr>c',    '<cmd>Lazy check<cr>',   { desc = 'Check'   })
+nmap('<leader><cr>l',    '<cmd>Lazy log<cr>',     { desc = 'Log'     })
+nmap('<leader><cr>r',    '<cmd>Lazy restore<cr>', { desc = 'Restore' })
+nmap('<leader><cr>p',    '<cmd>Lazy profile<cr>', { desc = 'Profile' })
+nmap('<leader><cr>b',    '<cmd>Lazy debug<cr>',   { desc = 'Debug'   })
+nmap('<leader><cr>h',    '<cmd>Lazy help<cr>',    { desc = 'Help'    })
 -- stylua: ignore end
----
 
---- load plugins
+-- load plugins
 require('lazy').setup({
   spec = {
-    { import = 'plugins.coding' },
-    { import = 'plugins.editor' },
-    { import = 'plugins.lang' },
-    { import = 'plugins.lang.tools' },
-    { import = 'plugins.ui' },
-    { import = 'plugins.utils' },
-    { import = 'plugins.custom' }
-  },
-  install = {
-    -- install missing plugins on startup. This doesn't increase startup time.
-    missing = true,
-    -- try to load one of these colorschemes when starting an installation during startup
-    colorscheme = { vim.g.colorscheme, 'habamax' },
+    -- { import = 'plugins.lang.tools' },
+    -- { import = 'plugins.lang' },
+    { import = 'plugins' },
   },
   ui = {
-    size = { width = 0.8, height = 0.8 },
-    border = 'rounded',
+    size = { width = vim.g.win_width, height = vim.g.win_height },
+    border = require('config.icons').win.border,
     title = ' Lazy ',
   },
-  -- checker = {
-  --   -- automatically check for plugin updates
-  --   enabled = true,
-  --   concurrency = 1,
-  -- },
   performance = {
     rtp = {
       disabled_plugins = {
@@ -87,4 +71,3 @@ require('lazy').setup({
     },
   },
 })
----
